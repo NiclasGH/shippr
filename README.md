@@ -30,7 +30,7 @@ shippr[EXE] [OPTIONS]
     install [kube|helm]     Deploys kubectl or helm
     
     cluster <CLUSTER>       Sets the current cluster
-    check                   Performs a dry run to check that everything works
+    check <DIR>             Performs a dry run to check that everything works
     deploy <DIR>            Deploys the application in the specified directory [default: "."]
     cleanup <DIR>           Compares the deployed releases with the applications in the current directory. 
                             Undeploys if the directory doesn't contain the release.
