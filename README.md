@@ -4,7 +4,9 @@ Often you dont write a helmchart simply to deploy it but often you re-use it for
 1. A deployment file, that specifies the helmchart and version
 2. A `values-default.yaml`.
 
-If you use multiple profiles, you can also add multiple files like `values-dev.yaml` or `values-prod.yaml`
+If you use multiple profiles, you can also add multiple files like `values-dev.yaml` or `values-prod.yaml`.
+
+Read the [Rust CLI Book](https://rust-cli.github.io/book/index.html) if you're interested in creating your own CLI
 
 ## Deployment file
 The deployment file supports the following file formats: TOML, JSON, YAML, INI, RON, JSON.
@@ -40,6 +42,7 @@ shippr[EXE] [OPTIONS]
     -V, --version           Print version
 ```
 
-
+## Docker
+**TODO** here you can find a leightweight docker image for use in pipelines. It has kubectl, helm and shippr pre-installed
 
 
