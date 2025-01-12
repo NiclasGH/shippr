@@ -7,8 +7,21 @@ use crate::{Error, Result};
 
 #[derive(Debug, Deserialize)]
 struct AppConfig {
-    chart: String,
+    chart: ChartConfig,
 }
+#[derive(Debug, Deserialize)]
+struct ChartConfig {
+    name: String,
+    version: Option<String>,
+    namespace: Option<String>,
+    location: LocationConfig,
+}
+#[derive(Debug, Deserialize)]
+struct LocationConfig {
+    repo: Option<String>,
+    local: Option<String>,
+}
+
 impl AppConfig {
     pub fn new(base_path: &PathBuf, file_name: &str) -> Result<Self> {
         let directory_string = base_path.as_os_str().to_str().ok_or(
@@ -41,7 +54,13 @@ mod tests {
             .suffix(".yaml")
             .tempfile()?;
         let file_content = r#"
-        chart: MyChart
+        chart:
+            name: TestName
+            version: TestVersion
+            namespace: TestNamespace
+            location:
+                repo: TestRepo
+                local: TestPath
         "#;
         writeln!(&mut deployment_file, "{}", file_content)?;
         let binding = deployment_file.into_temp_path();
@@ -55,7 +74,11 @@ mod tests {
         let result = AppConfig::new(&std::env::temp_dir(), file_name)?;
 
         // then
-        assert_eq!(result.chart, "MyChart");
+        assert_eq!(result.chart.name, "TestName");
+        assert_eq!(result.chart.version, Some(String::from("TestVersion")));
+        assert_eq!(result.chart.namespace, Some(String::from("TestNamespace")));
+        assert_eq!(result.chart.location.repo, Some(String::from("TestRepo")));
+        assert_eq!(result.chart.location.local, Some(String::from("TestPath")));
 
         Ok(())
     }
