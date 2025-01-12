@@ -23,10 +23,11 @@ struct LocationConfig {
 }
 
 impl AppConfig {
-    pub fn new(base_path: &PathBuf, file_name: &str) -> Result<Self> {
+    pub fn new(base_path: &PathBuf, file_name: Option<&str>) -> Result<Self> {
         let directory_string = base_path.as_os_str().to_str().ok_or(
             Error::InvalidDirectory
         )?;
+        let file_name = file_name.unwrap_or("deployment");
         let config_path = format!("{directory_string}/{file_name}");
 
         let config = config::Config::builder()
@@ -71,7 +72,7 @@ mod tests {
             .unwrap();
 
         // when
-        let result = AppConfig::new(&std::env::temp_dir(), file_name)?;
+        let result = AppConfig::new(&std::env::temp_dir(), Some(file_name))?;
 
         // then
         assert_eq!(result.chart.name, "TestName");
