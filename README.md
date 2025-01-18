@@ -37,7 +37,7 @@ shippr[EXE] [OPTIONS]
         -n, --namespace     Only cleans up a specified namespace
     
     -y, --no-verify         Deploys/Undeploys without confirming the action
-    -p, --profile <NAME>    Deploys in a specific profile
+    -p, --profile <NAME>    Deploys in a specific profile (e.g. dev/prod etc.)
     -h, --help              Print help
     -V, --version           Print version
 ```
