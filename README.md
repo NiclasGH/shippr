@@ -43,6 +43,6 @@ shippr[EXE] [OPTIONS]
 ```
 
 ## Docker
-**TODO** here you can find a leightweight docker image for use in pipelines. It has kubectl, helm and shippr pre-installed
+**TODO** here you can find a leightweight docker image for use in pipelines. It has kubectl, helm and shippr pre-installed. Most likely debian based
 
 

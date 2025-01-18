@@ -19,17 +19,26 @@ enum Command {
     },
     /// Verifies that the chart can be deployed
     Check {
+        /// Profile to deploy (e.g. dev/prod etc.)
+        #[arg(long, short = 'p')]
+        profile: Option<String>,
+
         #[clap(flatten)]
-        action_args: ActionArgs
+        args: ActionArgs
     },
     /// Deploys helm chart by its deployment file
     Deploy {
+        /// Profile to deploy (e.g. dev/prod etc.)
+        #[arg(long, short = 'p')]
+        profile: Option<String>,
+
         #[clap(flatten)]
-        action_args: ActionArgs
+        args: ActionArgs
     },
     /// Cleans up any releases that are deployed but not defined
     Cleanup {
-        namespace: Option<String>,
+        #[clap(flatten)]
+        args: ActionArgs
     },
 }
 
@@ -38,10 +47,6 @@ struct ActionArgs {
     /// Namespace to deploy in. [Default: Current default namespace]
     #[arg(long, short = 'n')]
     namespace: Option<String>,
-
-    /// Profile to deploy (e.g. dev/prod etc.)
-    #[arg(long, short = 'p')]
-    profile: Option<String>,
     
     /// Directory of deployment file
     dir: PathBuf,
@@ -51,5 +56,10 @@ struct ActionArgs {
 fn main() {
     let app = App::parse();
 
-    println!("{:?}", app);
+    match app.command {
+        Command::Check { profile, args } => shippr::actions::check(profile, args.namespace, args.dir),
+        Command::Cleanup { args } => shippr::actions::cleanup(args.namespace, args.dir),
+        Command::Cluster { name } => shippr::actions::set_cluster(name),
+        Command::Deploy { profile, args } => shippr::actions::deploy(profile, args.namespace, args.dir),
+    }
 }
