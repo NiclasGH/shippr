@@ -1,5 +1,6 @@
 use std::path::PathBuf;
+use tracing::debug;
 
 pub fn check(profile: Option<String>, namespace: Option<String>, dir: PathBuf) {
-    dbg!(profile, namespace, dir);
+    debug!("Recieved the following parameters: profile: [{:?}], namespace: [{:?}], dir: [{:?}]", profile, namespace, dir);
 }

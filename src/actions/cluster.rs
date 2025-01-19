@@ -1,3 +1,5 @@
+use tracing::debug;
+
 pub fn set_cluster(name: String) {
-    dbg!(name);
+    debug!("Recieved the following parameters: name: [{:?}]", name);
 }

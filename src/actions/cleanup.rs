@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+use tracing::debug;
+
 pub fn cleanup(namespace: Option<String>, dir: PathBuf) {
-    dbg!(namespace, dir);
+    debug!("Recieved the following parameters: namespace: [{:?}], dir: [{:?}]", namespace, dir);
 }
