@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{error::Error, path::PathBuf};
 
 use clap::{ArgAction, Args, Parser, Subcommand};
 
@@ -67,7 +67,7 @@ struct ActionArgs {
 }
 
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     let app = App::parse();
 
     let log_level = match app.verbose {
@@ -86,7 +86,9 @@ fn main() {
     match app.command {
         Command::Check { profile, args } => shippr::actions::check(profile, args.namespace, args.dir),
         Command::Cleanup { args } => shippr::actions::cleanup(args.namespace, args.dir),
-        Command::Cluster { name } => shippr::actions::set_cluster(name),
+        Command::Cluster { name } => shippr::actions::set_cluster(name)?,
         Command::Deploy { profile, args } => shippr::actions::deploy(profile, args.namespace, args.dir),
     }
+
+    Ok(())
 }
