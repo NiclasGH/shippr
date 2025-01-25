@@ -31,7 +31,7 @@ impl Deployment {
         let file_name = file_name.unwrap_or("deployment");
         let config_path = format!("{directory_string}/{file_name}");
 
-        let config = config::Config::builder()
+        let config: Self = config::Config::builder()
             .add_source(File::with_name(&config_path))
             .build()?
             .try_deserialize()?;
