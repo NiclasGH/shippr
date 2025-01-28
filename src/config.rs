@@ -1,28 +1,29 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, process::Command};
 
 use config::File;
 use serde::Deserialize;
+use tracing::warn;
 
 use crate::{Error, Result};
 
 #[derive(Debug, Deserialize)]
-struct AppConfig {
-    chart: ChartConfig,
+struct Deployment {
+    chart: DeployChart,
 }
 #[derive(Debug, Deserialize)]
-struct ChartConfig {
+struct DeployChart {
     name: String,
     version: Option<String>,
     namespace: Option<String>,
-    location: LocationConfig,
+    location: Location,
 }
 #[derive(Debug, Deserialize)]
-struct LocationConfig {
+struct Location {
     repo: Option<String>,
     local: Option<String>,
 }
 
-impl AppConfig {
+impl Deployment {
     pub fn new(base_path: &PathBuf, file_name: Option<&str>) -> Result<Self> {
         let directory_string = base_path.as_os_str().to_str().ok_or(
             Error::InvalidDirectory
@@ -37,14 +38,46 @@ impl AppConfig {
 
         Ok(config)
     }
+
+    pub fn append_chart_location(&self, command: &mut Command) -> Result<()> {
+        if self.chart.has_duplicate_location() {
+            warn!("The charts have a duplicate location. Please ensure your deployment file only has 1 location");
+            return Err(Error::DuplicateLocation)
+        }
+
+        self.chart.append_chart_location(command);
+
+        Ok(())
+    }
 }
+
+impl DeployChart {
+    fn has_duplicate_location(&self) -> bool {
+        self.location.has_duplicate_location()
+    }
+
+    fn append_chart_location(&self, command: &mut Command) {
+        if let Some(v) = self.location.local {
+            command.arg(v)
+        } else if let Some(v) = self.location.repo {
+            command.arg(format!("--repo {v}"))
+        }
+    }
+}
+
+impl Location {
+    fn has_duplicate_location(&self) -> bool {
+        self.local.is_some() == self.repo.is_some()
+    }
+}
+
 
 #[cfg(test)]
 mod tests {
     use std::io::Write;
     use tempfile::Builder;
 
-    use super::AppConfig;
+    use super::Deployment;
     type TestResult = std::result::Result<(), Box<dyn std::error::Error>>;
 
     #[test]
@@ -72,7 +105,7 @@ mod tests {
             .unwrap();
 
         // when
-        let result = AppConfig::new(&std::env::temp_dir(), Some(file_name))?;
+        let result = Deployment::new(&std::env::temp_dir(), Some(file_name))?;
 
         // then
         assert_eq!(result.chart.name, "TestName");

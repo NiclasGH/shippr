@@ -7,4 +7,7 @@ pub enum Error {
 
     #[error("Configuration Error: {0}")]
     ConfigError(#[from] config::ConfigError),
+
+    #[error("Both the local and repository location are set. Only one can be set")]
+    DuplicateLocation,
 }
