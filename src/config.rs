@@ -57,10 +57,10 @@ impl DeployChart {
     }
 
     fn append_chart_location(&self, command: &mut Command) {
-        if let Some(v) = self.location.local {
-            command.arg(v)
-        } else if let Some(v) = self.location.repo {
-            command.arg(format!("--repo {v}"))
+        if let Some(v) = self.location.local.clone() {
+            command.arg(v);
+        } else if let Some(v) = self.location.repo.clone() {
+            command.arg(format!("--repo {v}"));
         }
     }
 }

@@ -16,3 +16,24 @@ pub fn set_cluster(name: String) -> Result<()> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod test {
+    use assert_cmd::Command;
+
+    type TestResult = std::result::Result<(), Box<dyn std::error::Error>>;
+
+    #[test]
+    fn uses_name_for_kubectl_cmd() -> TestResult {
+        // when
+        let assert = Command::cargo_bin("shippr")?
+            .arg("cluster")
+            .arg("test-cluster")
+            .assert();
+        
+        // then
+        assert.success();
+
+        Ok(())
+    }
+}
