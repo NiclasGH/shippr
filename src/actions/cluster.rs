@@ -2,15 +2,21 @@ use std::{io::{self, Write}, process::Command};
 
 use crate::Result;
 
-use tracing::debug;
+use tracing::{debug, info};
 
 pub fn set_cluster(name: String) -> Result<()> {
     debug!("Recieved the following parameters: name: [{:?}]", name);
 
-    let output = Command::new("kubectl")
-        .args(["config", "use-context", &name])
-        .output()?;
+    let mut command = Command::new("kubectl");
+    command
+        .arg("config")
+        .arg("use-context")
+        .arg(&name);
 
+    let program = command.get_program();
+    info!("Running command {:?}", program);
+
+    let output = command.output()?;
     io::stdout().write_all(&output.stdout)?;
     io::stderr().write_all(&output.stderr)?;
 
