@@ -2,12 +2,12 @@ use std::{path::PathBuf, process::Command};
 
 use config::File;
 use serde::Deserialize;
-use tracing::warn;
+use tracing::{debug, warn};
 
 use crate::{Error, Result};
 
 #[derive(Debug, Deserialize)]
-struct Deployment {
+pub struct Deployment {
     chart: DeployChart,
 }
 #[derive(Debug, Deserialize)]
@@ -23,12 +23,25 @@ struct Location {
     local: Option<String>,
 }
 
+pub struct DeploymentFileName(String);
+
+impl Default for DeploymentFileName {
+    fn default() -> Self {
+        Self(String::from("deployment"))
+    }
+}
+
 impl Deployment {
-    pub fn new(base_path: &PathBuf, file_name: Option<&str>) -> Result<Self> {
+    pub fn new(base_path: &PathBuf, file_name: Option<DeploymentFileName>) -> Result<Self> {
         let directory_string = base_path.as_os_str().to_str().ok_or(
             Error::InvalidDirectory
         )?;
-        let file_name = file_name.unwrap_or("deployment");
+
+        let file_name = file_name.unwrap_or_else(|| {
+            debug!("File name not provided. Taking default");
+            DeploymentFileName::default()
+        }).0;
+
         let config_path = format!("{directory_string}/{file_name}");
 
         let config: Self = config::Config::builder()
@@ -77,7 +90,7 @@ mod tests {
     use std::io::Write;
     use tempfile::Builder;
 
-    use super::Deployment;
+    use super::{Deployment, DeploymentFileName};
     type TestResult = std::result::Result<(), Box<dyn std::error::Error>>;
 
     #[test]
@@ -105,7 +118,7 @@ mod tests {
             .unwrap();
 
         // when
-        let result = Deployment::new(&std::env::temp_dir(), Some(file_name))?;
+        let result = Deployment::new(&std::env::temp_dir(), Some(DeploymentFileName(file_name.to_string())))?;
 
         // then
         assert_eq!(result.chart.name, "TestName");
