@@ -13,6 +13,9 @@ The deployment file supports the following file formats: TOML, JSON, YAML, INI, 
 
 In there you simply need the following structure (example in yaml):
 ```yaml
+image: full/path/to/image:52
+release_name: my-app
+
 chart:
     name: ingress-nginx                                     # Required
     version: 1.12.0                                         # Optional
@@ -44,5 +47,63 @@ shippr[EXE] [OPTIONS]
 
 ## Docker
 **TODO** here you can find a leightweight docker image for use in pipelines. It has kubectl, helm and shippr pre-installed. Most likely debian based
+
+## Under the hood commands:
+Cluster:
+`shippr cluster my-cluster`
+name: Cluster to set to
+
+Check:
+```bash
+helm upgrade --install <release_name> <chart_name> \
+    --version <version> \
+    --namespace <namespace> \
+    (--repo <repo>|dir) \
+    -f values-default.yaml \
+    -f values-<profile>.yaml \
+    --dry-run
+```
+In File:
+release_name
+chart_name
+version
+namespace
+repo / directory
+
+In command:
+profile
+
+Deploy
+```bash
+helm upgrade --install <release_name> <chart_name> \
+    --version <version> \
+    --namespace <namespace> \
+    (--repo <repo>|dir) \
+    -f values-default.yaml \
+    -f values-<profile>.yaml \
+    --wait
+```
+Same as above
+
+Cleanup
+```bash
+# Known releases
+known = for dir in ls {
+    read deployment file and take release_name
+}
+
+released = helm list --namespace <namespace>
+
+for release in released {
+    if not in known {
+        undeploy
+    }
+}
+
+
+
+
+
+
 
 

@@ -1,10 +1,10 @@
-use std::{path::PathBuf, process::Command};
+use std::path::PathBuf;
 
 use config::File;
 use serde::Deserialize;
 use tracing::{debug, warn};
 
-use crate::{Error, Result};
+use crate::{command::Command, Error, Result};
 
 #[derive(Debug, Deserialize)]
 pub struct Deployment {
@@ -16,6 +16,11 @@ struct DeployChart {
     version: Option<String>,
     namespace: Option<String>,
     location: Location,
+}
+#[derive(Debug, Deserialize)]
+struct Release {
+    image: String,
+    release_name: String,
 }
 #[derive(Debug, Deserialize)]
 struct Location {
@@ -52,13 +57,13 @@ impl Deployment {
         Ok(config)
     }
 
-    pub fn append_chart_location(&self, command: &mut Command) -> Result<()> {
+    pub fn append_chart_information(&self, command: &mut Command) -> Result<()> {
         if self.chart.has_duplicate_location() {
             warn!("The charts have a duplicate location. Please ensure your deployment file only has 1 location");
             return Err(Error::DuplicateLocation)
         }
 
-        self.chart.append_chart_location(command);
+        self.chart.append_chart_information(command);
 
         Ok(())
     }
@@ -67,6 +72,21 @@ impl Deployment {
 impl DeployChart {
     fn has_duplicate_location(&self) -> bool {
         self.location.has_duplicate_location()
+    }
+
+    fn append_chart_information(&self, command: &mut Command) {
+        command.arg(&self.name);
+
+        if let Some(version) = &self.version {
+            command.args(["--version", version]);
+        }
+
+        if let Some(namespace) = &self.namespace {
+            command.args(["--namespace", namespace]);
+            command.arg("--create-namespace");
+        }
+
+        self.append_chart_location(command);
     }
 
     fn append_chart_location(&self, command: &mut Command) {

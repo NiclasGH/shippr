@@ -54,7 +54,7 @@ enum Command {
 
 #[derive(Debug, Args)]
 struct ActionArgs {
-    /// Namespace to deploy in. [Default: Current default namespace]
+    /// Namespace to deploy in. [Default: Current default namespace or namespace in deployment file]
     #[arg(long, short = 'n')]
     namespace: Option<String>,
 
