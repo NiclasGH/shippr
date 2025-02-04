@@ -1,44 +1,41 @@
-use std::{io::{self, Write}, process::Command};
+use crate::{command::Command, Result};
 
-use crate::Result;
+use tracing::debug;
 
-use tracing::{debug, info};
-
-pub fn set_cluster(name: String) -> Result<()> {
+pub fn set_cluster(name: &str) -> Result<()> {
     debug!("Recieved the following parameters: name: [{:?}]", name);
-
-    let mut command = Command::new("kubectl");
-    command
-        .arg("config")
-        .arg("use-context")
-        .arg(&name);
-
-    let program = command.get_program();
-    info!("Running command {:?}", program);
-
-    let output = command.output()?;
-    io::stdout().write_all(&output.stdout)?;
-    io::stderr().write_all(&output.stderr)?;
+    create_set_cluster(name).execute()?;
 
     Ok(())
 }
 
+fn create_set_cluster(name: &str) -> Command {
+    let mut command = Command::new("kubectl");
+    command
+        .arg("config")
+        .arg("use-context")
+        .arg(name);
+
+    command
+}
+
 #[cfg(test)]
 mod test {
-    use assert_cmd::Command;
+    use crate::actions::cluster::create_set_cluster;
 
     type TestResult = std::result::Result<(), Box<dyn std::error::Error>>;
 
     #[test]
     fn uses_name_for_kubectl_cmd() -> TestResult {
+        // given
+        let name = "testName";
+
         // when
-        let assert = Command::cargo_bin("shippr")?
-            .arg("cluster")
-            .arg("test-cluster")
-            .assert();
-        
+        let command = create_set_cluster(name);
+
         // then
-        assert.success();
+        assert_eq!(command.get_program(), "kubectl");
+        assert_eq!(command.get_args(), &["config", "use-context", "testName"]);
 
         Ok(())
     }

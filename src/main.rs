@@ -84,9 +84,9 @@ fn main() -> Result<(), Box<dyn Error>> {
         .init();
 
     match app.command {
-        Command::Check { profile, args } => shippr::actions::check(profile, args.namespace, args.dir),
+        Command::Check { profile, args } => shippr::actions::check(profile, args.namespace, args.dir)?,
         Command::Cleanup { args } => shippr::actions::cleanup(args.namespace, args.dir),
-        Command::Cluster { name } => shippr::actions::set_cluster(name)?,
+        Command::Cluster { name } => shippr::actions::set_cluster(&name)?,
         Command::Deploy { profile, args } => shippr::actions::deploy(profile, args.namespace, args.dir),
     }
 
