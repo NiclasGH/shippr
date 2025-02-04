@@ -13,8 +13,8 @@ The deployment file supports the following file formats: TOML, JSON, YAML, INI, 
 
 In there you simply need the following structure (example in yaml):
 ```yaml
-image: full/path/to/image:52
-release_name: my-app
+image: full/path/to/image:52                                # Required - possible extension. First version will use the values file
+release_name: my-app                                        # Required - As a possible extension it can use the directory name. Or default?
 
 chart:
     name: ingress-nginx                                     # Required

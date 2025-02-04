@@ -10,3 +10,8 @@
 - [ ] Implement install kube
 - [ ] Implement install helm
 - [ ] Implement cluster
+
+# Potential extensions
+Allowing namespace priority: CLI > File > Default
+Allowing image through deployment file
+Taking the release name from the deployment file directory
