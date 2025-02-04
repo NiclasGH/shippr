@@ -1,0 +1,4 @@
+apiVersion: v2
+name: nginx
+description: A mini chart for testing shippr
+version: 1.0.0
