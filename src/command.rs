@@ -24,7 +24,6 @@ impl Command {
         self
     }
 
-    #[allow(dead_code)]
     pub(crate) fn args<I, A>(&mut self, arg: I) -> &mut Self
     where 
         I: IntoIterator<Item = A>,
@@ -46,7 +45,6 @@ impl Command {
 
         Ok(())
     }
-
 }
 
 #[cfg(test)]

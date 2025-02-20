@@ -24,7 +24,6 @@ fn create_check(profile: Option<String>) -> Command {
     let mut command = Command::new("helm");
     command
         .args(["upgrade", "--install"])
-        .arg("--wait")
         .arg("--dry-run")
         .args(["-f", "values-default.yaml"]);
 
@@ -35,3 +34,7 @@ fn create_check(profile: Option<String>) -> Command {
     command
 }
 
+#[cfg(test)]
+mod tests {
+    // TODO write a test for create_check with and without profile
+}
