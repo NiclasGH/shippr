@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::Path;
 
 use config::File;
 use serde::Deserialize;
@@ -37,7 +37,7 @@ impl Default for DeploymentFileName {
 }
 
 impl Deployment {
-    pub fn new(base_path: &PathBuf, file_name: Option<DeploymentFileName>) -> Result<Self> {
+    pub fn new(base_path: &Path, file_name: Option<DeploymentFileName>) -> Result<Self> {
         let directory_string = base_path.as_os_str().to_str().ok_or(
             Error::InvalidDirectory
         )?;

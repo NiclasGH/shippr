@@ -48,15 +48,16 @@ enum Command {
     /// Cleans up any releases that are deployed but not defined
     Cleanup {
         #[command(flatten)]
-        args: ActionArgs
+        args: ActionArgs,
+
+        /// Namespace to cleanup.
+        #[arg(long, short = 'n')]
+        namespace: String,
     },
 }
 
 #[derive(Debug, Args)]
 struct ActionArgs {
-    /// Namespace to deploy in. [Default: Current default namespace or namespace in deployment file]
-    #[arg(long, short = 'n')]
-    namespace: Option<String>,
 
     /// Will not verify for deployments. Good for CI/CDs
     #[arg(long, short = 'y', action = ArgAction::SetTrue)]
@@ -84,10 +85,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         .init();
 
     match app.command {
-        Command::Check { profile, args } => shippr::actions::check(profile, args.namespace, args.dir)?,
-        Command::Cleanup { args } => shippr::actions::cleanup(args.namespace, args.dir),
+        Command::Check { profile, args } => shippr::actions::check(profile, args.dir)?,
+        Command::Cleanup { namespace, args } => shippr::actions::cleanup(namespace, args.dir),
         Command::Cluster { name } => shippr::actions::set_cluster(&name)?,
-        Command::Deploy { profile, args } => shippr::actions::deploy(profile, args.namespace, args.dir),
+        Command::Deploy { profile, args } => shippr::actions::deploy(profile, args.dir),
     }
 
     Ok(())
