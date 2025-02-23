@@ -8,6 +8,7 @@ use crate::{command::Command, Error, Result};
 
 #[derive(Debug, Deserialize)]
 pub struct Deployment {
+    release: Release,
     chart: DeployChart,
 }
 #[derive(Debug, Deserialize)]
@@ -19,7 +20,7 @@ struct DeployChart {
 }
 #[derive(Debug, Deserialize)]
 struct Release {
-    image: String,
+    //image: String, this is a possible extension. Use values files for now
     release_name: String,
 }
 #[derive(Debug, Deserialize)]
@@ -57,15 +58,22 @@ impl Deployment {
         Ok(config)
     }
 
-    pub fn append_chart_information(&self, command: &mut Command) -> Result<()> {
+    pub fn append_deployment_information(&self, command: &mut Command) -> Result<()> {
         if self.chart.has_duplicate_location() {
             warn!("The charts have a duplicate location. Please ensure your deployment file only has 1 location");
             return Err(Error::DuplicateLocation)
         }
 
+        self.release.append_release_information(command);
         self.chart.append_chart_information(command);
 
         Ok(())
+    }
+}
+
+impl Release {
+    fn append_release_information(&self, command: &mut Command) {
+        command.arg(&self.release_name);
     }
 }
 

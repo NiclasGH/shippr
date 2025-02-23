@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use tracing::{debug, info};
-use crate::{command::Command, config::*, Result};
+
+use crate::{command::Command, config::*, Error, Result};
 
 pub fn check(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
     debug!("Recieved the following parameters: profile: [{:?}], dir: [{:?}]", profile, deploy_file_dir);
@@ -9,29 +10,45 @@ pub fn check(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
     info!("Deployment file found. Checking deployment");
 
     debug!("Checking values-default.yaml exists");
-    // TODO verify values-default.yaml exists
-
-    if let Some(p) = &profile {
-        info!("Profile is set. Loading values-{}.yaml exists", p);
-        // TODO verify values-{profile}.yaml exists
+    let values_default = deploy_file_dir.clone().join("values-default.yaml");
+    if !values_default.exists() {
+        return Err(Error::ValuesDefaultMissing(values_default));
     }
 
-    let command = create_check(profile);
-    std::process::exit(1);
+    let values_profile = if let Some(p) = &profile {
+        let file_name = format!("values-{}.yaml", p);
+        info!("Profile is set. Checking {} exists", file_name);
+        let values_profile = deploy_file_dir.clone().join(file_name);
+        if !values_profile.exists() {
+            return Err(Error::ValuesProfileMissing(values_profile));
+        }
+
+        Some(values_profile)
+    } else { None };
+
+    create_check(deployment, values_default, values_profile)?.execute()?;
+
+    Ok(())
 }
 
-fn create_check(profile: Option<String>) -> Command {
+fn create_check(
+    deployment: Deployment, 
+    values_default: PathBuf, 
+    values_profile: Option<PathBuf>
+) -> Result<Command> {
     let mut command = Command::new("helm");
-    command
-        .args(["upgrade", "--install"])
-        .arg("--dry-run")
-        .args(["-f", "values-default.yaml"]);
+    command.args(["upgrade", "--install"]);
+    deployment.append_deployment_information(&mut command)?;
 
-    if let Some(p) = profile {
-        command.args(["-f", &format!("values-{p}.yaml")]);
+    command
+        .arg("--dry-run")
+        .args(["-f", values_default.to_str().unwrap()]);
+
+    if let Some(p) = values_profile {
+        command.args(["-f", p.to_str().unwrap()]);
     }
 
-    command
+    Ok(command)
 }
 
 #[cfg(test)]

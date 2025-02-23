@@ -1,4 +1,5 @@
 use std::string::FromUtf8Error;
+use std::path::PathBuf;
 
 pub(crate) type Result<T> = std::result::Result<T, Error>;
 
@@ -7,11 +8,18 @@ pub enum Error {
     #[error("The given directory is not a valid path")]
     InvalidDirectory,
 
-    #[error("Configuration Error: {0}")]
-    ConfigError(#[from] config::ConfigError),
-
     #[error("Both the local and repository location are set. Only one can be set")]
     DuplicateLocation,
+
+    #[error("The values-default.yaml file does not exist: path: {0}")]
+    ValuesDefaultMissing(PathBuf),
+
+    #[error("A profile was passed but no fitting values file exists: path: {0}")]
+    ValuesProfileMissing(PathBuf),
+
+    // external errors
+    #[error("Configuration Error: {0}")]
+    ConfigError(#[from] config::ConfigError),
 
     #[error("I/O Error: {0}")]
     IoError(#[from] std::io::Error),
