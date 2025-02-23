@@ -99,7 +99,7 @@ impl DeployChart {
         if let Some(v) = self.location.local.clone() {
             command.arg(v);
         } else if let Some(v) = self.location.repo.clone() {
-            command.arg(format!("--repo {v}"));
+            command.args(["--repo", &v]);
         }
     }
 }

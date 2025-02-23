@@ -14,7 +14,7 @@ The deployment file supports the following file formats: TOML, JSON, YAML, INI, 
 In there you simply need the following structure (example in yaml):
 ```yaml
 release:
-    image: full/path/to/image:52                                # Required - possible extension. First version will use the values file
+    image: full/path/to/image:52                                # Optional - possible extension. First version will use the values file
     release_name: my-app                                        # Required - As a possible extension it can use the directory name. Or default?
 
 chart:
@@ -33,11 +33,11 @@ For the location, repo will be prioritized
 shippr[EXE] [OPTIONS]
     install [kube|helm]     Deploys kubectl or helm
     
-    cluster <CLUSTER>       Sets the current cluster
-    check <DIR>             Performs a dry run to check that everything works
+    cluster <CLUSTER>       Sets the current cluster [default: "."]
+    check <DIR>             Performs a dry run to check that everything works [default: "."]
     deploy <DIR>            Deploys the application in the specified directory [default: "."]
     cleanup <DIR>           Compares the deployed releases with the applications in the current directory. 
-                            Undeploys if the directory doesn't contain the release.
+                            Undeploys if the directory doesn't contain the release. [default: "."]
         -n, --namespace     Only cleans up a specified namespace
     
     -y, --no-verify         Deploys/Undeploys without confirming the action
@@ -50,15 +50,12 @@ shippr[EXE] [OPTIONS]
 **TODO** here you can find a leightweight docker image for use in pipelines. It has kubectl, helm and shippr pre-installed. Most likely debian based
 
 ## Under the hood commands:
-Cluster:
-`shippr cluster my-cluster`
-name: Cluster to set to
-
 Check:
 ```bash
 helm upgrade --install <release_name> <chart_name> \
     --version <version> \
     --namespace <namespace> \
+    --create-namespace \
     (--repo <repo>|dir) \
     -f values-default.yaml \
     -f values-<profile>.yaml \
@@ -79,6 +76,7 @@ Deploy
 helm upgrade --install <release_name> <chart_name> \
     --version <version> \
     --namespace <namespace> \
+    --create-namespace \
     (--repo <repo>|dir) \
     -f values-default.yaml \
     -f values-<profile>.yaml \

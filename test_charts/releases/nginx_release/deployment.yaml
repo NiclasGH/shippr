@@ -1,4 +1,3 @@
-image: nginx:latest
 release_name: my-nginx
 
 chart:
