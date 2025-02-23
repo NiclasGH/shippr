@@ -2,12 +2,12 @@ use std::io;
 use crate::Result;
 
 /// Asks the user for an input and returns the given answer
-pub(crate) fn user_confirm(prompt: &str) -> Result<bool> {
-    internal_user_confirm(prompt, io::stdin().lock())
+pub(crate) fn user_confirmation(prompt: &str) -> Result<bool> {
+    internal_user_confirmation(prompt, io::stdin().lock())
 }
 
 /// Testable internal interface
-fn internal_user_confirm<R>(prompt: &str, mut reader: R) -> Result<bool>
+fn internal_user_confirmation<R>(prompt: &str, mut reader: R) -> Result<bool>
 where
     R: io::BufRead,
 {
@@ -40,7 +40,7 @@ mod tests {
     #[case(b"YES")]
     fn accept_true(#[case] input: &[u8]) -> TestResult {
         // when
-        let result = internal_user_confirm("Unimportant prompt", input)?;
+        let result = internal_user_confirmation("Unimportant prompt", input)?;
 
         // then
         assert!(result);
@@ -57,7 +57,7 @@ mod tests {
     #[case(b"ok")]
     fn deny_false(#[case] input: &[u8]) -> TestResult {
         // when
-        let result = internal_user_confirm("Unimportant prompt", input)?;
+        let result = internal_user_confirmation("Unimportant prompt", input)?;
 
         // then
         assert!(!result);

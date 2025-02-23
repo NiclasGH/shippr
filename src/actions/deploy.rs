@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use tracing::{debug, info};
 
-use crate::{command::Command, config::*, Result};
+use crate::{command::Command, config::*, io::user_confirmation, Result};
 use super::values;
 
 pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
@@ -12,7 +12,10 @@ pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
 
     let values_default = values::default(deploy_file_dir.clone())?;
     let values_profile = values::profile(deploy_file_dir, &profile)?;
-    // TODO ask for verification
+
+    if !user_confirmation("Do you really want to deploy with the following profile: {profile:?}")? {
+        return Ok(());
+    }
 
     create_deploy(deployment, values_default, values_profile).execute()?;
 
