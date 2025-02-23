@@ -55,19 +55,17 @@ impl Deployment {
             .build()?
             .try_deserialize()?;
 
-        Ok(config)
-    }
-
-    pub fn append_deployment_information(&self, command: &mut Command) -> Result<()> {
-        if self.chart.has_duplicate_location() {
+        if config.chart.has_duplicate_location() {
             warn!("The charts have a duplicate location. Please ensure your deployment file only has 1 location");
             return Err(Error::DuplicateLocation)
         }
 
+        Ok(config)
+    }
+
+    pub fn append_deployment_information(&self, command: &mut Command) {
         self.release.append_release_information(command);
         self.chart.append_chart_information(command);
-
-        Ok(())
     }
 }
 
@@ -112,11 +110,11 @@ impl Location {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use std::io::Write;
     use tempfile::Builder;
+    use std::matches;
 
     use super::{Deployment, DeploymentFileName};
     type TestResult = std::result::Result<(), Box<dyn std::error::Error>>;
@@ -129,13 +127,15 @@ mod tests {
             .suffix(".yaml")
             .tempfile()?;
         let file_content = r#"
+        release:
+            release_name: TestRelease
+
         chart:
             name: TestName
             version: TestVersion
             namespace: TestNamespace
             location:
                 repo: TestRepo
-                local: TestPath
         "#;
         writeln!(&mut deployment_file, "{}", file_content)?;
         let binding = deployment_file.into_temp_path();
@@ -153,8 +153,67 @@ mod tests {
         assert_eq!(result.chart.version, Some(String::from("TestVersion")));
         assert_eq!(result.chart.namespace, Some(String::from("TestNamespace")));
         assert_eq!(result.chart.location.repo, Some(String::from("TestRepo")));
-        assert_eq!(result.chart.location.local, Some(String::from("TestPath")));
+        assert_eq!(result.chart.location.local, None);
+        assert_eq!(result.release.release_name, String::from("TestRelease"));
 
         Ok(())
+    }
+
+    #[test]
+    fn file_deserialized_duplicate_location_error() -> TestResult {
+        // given
+        let mut deployment_file = Builder::new()
+            .prefix("deployment")
+            .suffix(".yaml")
+            .tempfile()?;
+        let file_content = r#"
+        release:
+            release_name: TestRelease
+
+        chart:
+            name: TestName
+            version: TestVersion
+            namespace: TestNamespace
+            location:
+                repo: TestRepo
+                local: TestPath
+        "#;
+        writeln!(&mut deployment_file, "{}", file_content)?;
+        let binding = deployment_file.into_temp_path();
+        let file_name = binding
+            .file_name()
+            .unwrap()
+            .to_str()
+            .unwrap();
+
+        // when
+        let result = Deployment::new(&std::env::temp_dir(), Some(DeploymentFileName(file_name.to_string())));
+
+        // then
+        assert!(matches!(result.err(), Some(crate::Error::DuplicateLocation)));
+
+        Ok(())
+    }
+}
+
+#[cfg(test)]
+pub mod test_fixtures {
+    use super::{Deployment, Release, DeployChart, Location};
+
+    pub fn deployment() -> Deployment {
+        Deployment {
+            release: Release {
+                release_name: String::from("TestRelease"),
+            },
+            chart: DeployChart {
+                name: String::from("TestChartName"),
+                version: Some(String::from("TestVersion")),
+                namespace: Some(String::from("TestNamespace")),
+                location: Location {
+                    repo: Some(String::from("TestRepo")),
+                    local: None,
+                },
+            },
+        }
     }
 }

@@ -26,7 +26,7 @@ pub fn check(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
         Some(values_profile)
     } else { None };
 
-    create_check(deployment, values_default, values_profile)?.execute()?;
+    create_check(deployment, values_default, values_profile).execute()?;
 
     Ok(())
 }
@@ -35,10 +35,10 @@ fn create_check(
     deployment: Deployment, 
     values_default: PathBuf, 
     values_profile: Option<PathBuf>
-) -> Result<Command> {
+) -> Command {
     let mut command = Command::new("helm");
     command.args(["upgrade", "--install"]);
-    deployment.append_deployment_information(&mut command)?;
+    deployment.append_deployment_information(&mut command);
 
     command
         .arg("--dry-run")
@@ -48,7 +48,7 @@ fn create_check(
         command.args(["-f", p.to_str().unwrap()]);
     }
 
-    Ok(command)
+    command
 }
 
 #[cfg(test)]
