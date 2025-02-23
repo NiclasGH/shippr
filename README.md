@@ -50,40 +50,6 @@ shippr[EXE] [OPTIONS]
 **TODO** here you can find a leightweight docker image for use in pipelines. It has kubectl, helm and shippr pre-installed. Most likely debian based
 
 ## Under the hood commands:
-Check:
-```bash
-helm upgrade --install <release_name> <chart_name> \
-    --version <version> \
-    --namespace <namespace> \
-    --create-namespace \
-    (--repo <repo>|dir) \
-    -f values-default.yaml \
-    -f values-<profile>.yaml \
-    --dry-run
-```
-In File:
-release_name
-chart_name
-version
-namespace
-repo / directory
-
-In command:
-profile
-
-Deploy
-```bash
-helm upgrade --install <release_name> <chart_name> \
-    --version <version> \
-    --namespace <namespace> \
-    --create-namespace \
-    (--repo <repo>|dir) \
-    -f values-default.yaml \
-    -f values-<profile>.yaml \
-    --wait
-```
-Same as above
-
 Cleanup
 ```bash
 # Known releases

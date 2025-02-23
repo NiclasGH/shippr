@@ -1,15 +1,14 @@
 - [x] Read deployment file
-- [ ] Create very basic helmchart for testing
+- [x] Create very basic helmchart for testing
 - [x] Create basic clap setup with app description.
-- [ ] Implement check 
-- [ ] Implement namepace option
-- [ ] Implement deploy
+- [x] Implement check 
+- [x] Implement namepace option
+- [x] Implement deploy
 - [ ] Implement the no-verify option
-- [ ] Implement profile option
+- [x] Implement profile option
 - [ ] Implement cleanup
-- [ ] Implement install kube
-- [ ] Implement install helm
-- [ ] Implement cluster
+- [x] Implement cluster
+- [ ] Create guide for simple Dockerfile
 
 # Potential extensions
 Allowing namespace priority: CLI > File > Default
