@@ -1,7 +1,7 @@
 mod error;
 
 pub(crate) mod command;
-pub(crate) mod config;
+pub(crate) mod deploy_config;
 pub(crate) mod io;
 
 pub mod actions;

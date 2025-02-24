@@ -57,7 +57,7 @@ known = for dir in ls {
     read deployment file and take release_name
 }
 
-released = helm list --namespace <namespace>
+released = helm list --namespace <NAMESPACE> -o yaml (deseralize)
 
 for release in released {
     if not in known {

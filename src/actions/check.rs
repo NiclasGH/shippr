@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use tracing::{debug, info};
 
-use crate::{command::Command, config::*, Result};
+use crate::{command::Command, deploy_config::*, Result};
 use super::values;
 
 pub fn check(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
@@ -44,7 +44,7 @@ fn create_check(
 mod tests {
     use std::{error::Error, path::PathBuf, str::FromStr};
 
-    use crate::config::test_fixtures::deployment;
+    use crate::deploy_config::test_fixtures::deployment;
 
     use super::create_check;
 
