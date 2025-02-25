@@ -13,7 +13,7 @@ pub fn default(base_path: PathBuf) -> Result<PathBuf> {
 }
 
 pub fn profile(base_path: PathBuf, profile: &Option<String>) -> Result<Option<PathBuf>> {
-    debug!("Checking if profil is set");
+    debug!("Checking if profile is set");
     if let Some(p) = profile {
         let file_name = format!("values-{}.yaml", p);
         info!("Profile is set. Checking {} exists", file_name);

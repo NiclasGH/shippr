@@ -3,7 +3,7 @@ use crate::{command::Command, Result};
 use tracing::debug;
 
 pub fn set_cluster(name: &str) -> Result<()> {
-    debug!("Recieved the following parameters: name: [{:?}]", name);
+    debug!("Received the following parameters: name: [{:?}]", name);
     create_set_cluster(name).execute()?;
 
     Ok(())
