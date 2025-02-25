@@ -71,6 +71,19 @@ struct ActionArgs {
 fn main() -> Result<(), Box<dyn Error>> {
     let app = App::parse();
 
+    setup_logger(&app);
+
+    match app.command {
+        Command::Check { profile, args } => shippr::actions::check(profile, args.dir)?,
+        Command::Cleanup { namespace, args } => shippr::actions::cleanup(namespace, args.dir),
+        Command::Cluster { name } => shippr::actions::set_cluster(&name)?,
+        Command::Deploy { profile, args } => shippr::actions::deploy(profile, args.dir)?,
+    }
+
+    Ok(())
+}
+
+fn setup_logger(app: &App) {
     let log_level = match app.verbose {
         0 => tracing::Level::ERROR,
         1 => tracing::Level::WARN,
@@ -83,13 +96,4 @@ fn main() -> Result<(), Box<dyn Error>> {
         .with_file(false)
         .without_time()
         .init();
-
-    match app.command {
-        Command::Check { profile, args } => shippr::actions::check(profile, args.dir)?,
-        Command::Cleanup { namespace, args } => shippr::actions::cleanup(namespace, args.dir),
-        Command::Cluster { name } => shippr::actions::set_cluster(&name)?,
-        Command::Deploy { profile, args } => shippr::actions::deploy(profile, args.dir)?,
-    }
-
-    Ok(())
 }

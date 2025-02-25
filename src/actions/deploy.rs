@@ -5,7 +5,7 @@ use crate::{command::Command, deploy_config::*, io::user_confirmation, Result};
 use super::values;
 
 pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
-    debug!("Recieved the following parameters: profile: [{:?}], dir: [{:?}]", profile, deploy_file_dir);
+    debug!("Received the following parameters: profile: [{:?}], dir: [{:?}]", profile, deploy_file_dir);
 
     let deployment = Deployment::new(&deploy_file_dir, None)?;
     info!("Deployment file found. Checking deployment");
