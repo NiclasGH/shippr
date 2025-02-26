@@ -73,9 +73,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     match app.command {
         Command::Check { profile, args } => shippr::actions::check(profile, args.dir)?,
-        Command::Cleanup { namespace, args } => shippr::actions::cleanup(namespace, args.dir)?,
+        Command::Cleanup { namespace, args } => shippr::actions::cleanup(namespace, args.dir, args.no_verify)?,
         Command::Cluster { name } => shippr::actions::set_cluster(&name)?,
-        Command::Deploy { profile, args } => shippr::actions::deploy(profile, args.dir)?,
+        Command::Deploy { profile, args } => shippr::actions::deploy(profile, args.dir, args.no_verify)?,
     }
 
     Ok(())

@@ -5,7 +5,7 @@ use crate::io::user_confirmation;
 use log::debug;
 use std::path::PathBuf;
 
-pub fn cleanup(namespace: String, dir: PathBuf) -> Result<()> {
+pub fn cleanup(namespace: String, dir: PathBuf, no_verify: bool) -> Result<()> {
     debug!(
         "Received the following parameters: namespace: [{:?}], dir: [{:?}]",
         namespace, dir
@@ -14,12 +14,16 @@ pub fn cleanup(namespace: String, dir: PathBuf) -> Result<()> {
     let defined_releases = find_defined_releases(dir)?;
 
     let difference = currently_released.difference(&defined_releases);
+    if difference.len() == 0 {
+        println!("Nothing to cleanup");
+        return Ok(())
+    }
 
     let user_confirm = format!(
         "The following would be undeployed: {}: Proceed? [Y/N]",
         difference
     );
-    if !user_confirmation(&user_confirm)? {
+    if !no_verify && !user_confirmation(&user_confirm)? {
         return Ok(());
     }
     difference.undeploy(&namespace)?;

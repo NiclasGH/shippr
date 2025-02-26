@@ -4,7 +4,7 @@ use tracing::{debug, info};
 use super::values;
 use crate::{Result, command::Command, deploy_config::*, io::user_confirmation};
 
-pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
+pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf, no_verify: bool) -> Result<()> {
     debug!(
         "Received the following parameters: profile: [{:?}], dir: [{:?}]",
         profile, deploy_file_dir
@@ -18,10 +18,11 @@ pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
 
     let prompt =
         format!("Do you really want to deploy with the following profile: {profile:?}: [Y/N]");
-    if !user_confirmation(&prompt)? {
+    if !no_verify && !user_confirmation(&prompt)? {
         return Ok(());
     }
 
+    println!("Deploying chart.");
     create_deploy(deployment, values_default, values_profile).execute()?;
 
     Ok(())
