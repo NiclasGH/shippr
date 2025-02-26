@@ -1,11 +1,14 @@
 use std::path::PathBuf;
 use tracing::{debug, info};
 
-use crate::{command::Command, deploy_config::*, io::user_confirmation, Result};
 use super::values;
+use crate::{Result, command::Command, deploy_config::*, io::user_confirmation};
 
 pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
-    debug!("Received the following parameters: profile: [{:?}], dir: [{:?}]", profile, deploy_file_dir);
+    debug!(
+        "Received the following parameters: profile: [{:?}], dir: [{:?}]",
+        profile, deploy_file_dir
+    );
 
     let deployment = Deployment::new(&deploy_file_dir, None)?;
     info!("Deployment file found. Checking deployment");
@@ -13,7 +16,8 @@ pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
     let values_default = values::default(deploy_file_dir.clone())?;
     let values_profile = values::profile(deploy_file_dir, &profile)?;
 
-    let prompt = format!("Do you really want to deploy with the following profile: {profile:?}: [Y/N]");
+    let prompt =
+        format!("Do you really want to deploy with the following profile: {profile:?}: [Y/N]");
     if !user_confirmation(&prompt)? {
         return Ok(());
     }
@@ -24,9 +28,9 @@ pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
 }
 
 fn create_deploy(
-    deployment: Deployment, 
-    values_default: PathBuf, 
-    values_profile: Option<PathBuf>
+    deployment: Deployment,
+    values_default: PathBuf,
+    values_profile: Option<PathBuf>,
 ) -> Command {
     let mut command = Command::new("helm");
     command
@@ -52,6 +56,7 @@ mod tests {
 
     type TestResult = std::result::Result<(), Box<dyn Error>>;
 
+    #[rustfmt::skip]
     #[test]
     fn deploy_no_profile() -> TestResult {
         // given
@@ -78,6 +83,7 @@ mod tests {
         Ok(())
     }
 
+    #[rustfmt::skip]
     #[test]
     fn deploy_with_profile() -> TestResult {
         // given

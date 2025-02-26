@@ -1,4 +1,8 @@
-use std::{ffi::OsStr, io::{stderr, stdout, Write}, process};
+use std::{
+    ffi::OsStr,
+    io::{Write, stderr, stdout},
+    process,
+};
 
 use tracing::info;
 
@@ -10,9 +14,11 @@ pub struct Command {
 
 impl Command {
     pub(crate) fn new(command: &str) -> Self {
-        Self { command: process::Command::new(command) }
+        Self {
+            command: process::Command::new(command),
+        }
     }
-    
+
     /// The advantage of AsRef vs &str
     /// AsRef: The callee can use &str or String and the method takes the ref when needed
     /// &str: The callee must borrow his String if he has one
@@ -25,9 +31,9 @@ impl Command {
     }
 
     pub(crate) fn args<I, A>(&mut self, arg: I) -> &mut Self
-    where 
+    where
         I: IntoIterator<Item = A>,
-        A: AsRef<OsStr>
+        A: AsRef<OsStr>,
     {
         self.command.args(arg);
 
@@ -68,4 +74,3 @@ impl Command {
         self.command.get_args().collect()
     }
 }
-

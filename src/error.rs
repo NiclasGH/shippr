@@ -1,5 +1,5 @@
-use std::string::FromUtf8Error;
 use std::path::PathBuf;
+use std::string::FromUtf8Error;
 
 pub(crate) type Result<T> = std::result::Result<T, Error>;
 

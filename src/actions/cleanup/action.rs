@@ -1,21 +1,26 @@
-use log::debug;
-use std::path::PathBuf;
+use crate::Result;
 use crate::actions::cleanup::model::Releases;
 use crate::command::Command;
 use crate::io::user_confirmation;
-use crate::Result;
+use log::debug;
+use std::path::PathBuf;
 
 pub fn cleanup(namespace: String, dir: PathBuf) -> Result<()> {
-    debug!("Received the following parameters: namespace: [{:?}], dir: [{:?}]", namespace, dir);
+    debug!(
+        "Received the following parameters: namespace: [{:?}], dir: [{:?}]",
+        namespace, dir
+    );
     let currently_released = find_currently_released(&namespace)?;
     let defined_releases = find_defined_releases(dir)?;
 
     let difference = currently_released.difference(&defined_releases);
 
-    let user_confirm =
-        format!("The following would be undeployed: {}: Proceed? [Y/N]", difference);
+    let user_confirm = format!(
+        "The following would be undeployed: {}: Proceed? [Y/N]",
+        difference
+    );
     if !user_confirmation(&user_confirm)? {
-        return Ok(())
+        return Ok(());
     }
     difference.undeploy(&namespace)?;
 
@@ -24,16 +29,15 @@ pub fn cleanup(namespace: String, dir: PathBuf) -> Result<()> {
 
 fn find_defined_releases(dir: PathBuf) -> Result<Releases> {
     let releases = std::fs::read_dir(dir)?;
-    let releases: Vec<_> = releases.filter_map(
-        |entry| {
+    let releases: Vec<_> = releases
+        .filter_map(|entry| {
             let entry = entry.ok()?;
             if entry.file_type().ok()?.is_dir() {
-                return entry.file_name().into_string().ok()
+                return entry.file_name().into_string().ok();
             }
 
             None
-        }
-    )
+        })
         .collect();
 
     Ok(Releases::new(releases))
@@ -68,10 +72,9 @@ mod tests {
 
         // then
         assert_eq!(result.get_program(), "helm");
-        assert_eq!(result.get_args(), [
-            "list",
-            "--namespace", namespace,
-            "-o", "yaml"
-        ]);
+        assert_eq!(
+            result.get_args(),
+            ["list", "--namespace", namespace, "-o", "yaml"]
+        );
     }
 }

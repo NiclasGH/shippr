@@ -6,7 +6,7 @@ use clap::{ArgAction, Args, Parser, Subcommand};
 #[clap(version)]
 /// A simple binary to manage your helmcharts.
 struct App {
-    /// Sets verbosity level. Can be used multiple times for more detail [e.g. -vvvv]. 
+    /// Sets verbosity level. Can be used multiple times for more detail [e.g. -vvvv].
     /// [Default: ERROR logs]
     #[arg(
         global = true,
@@ -25,7 +25,7 @@ enum Command {
     /// Configures the cluster
     Cluster {
         /// Name of the cluster/context to use
-        name: String
+        name: String,
     },
     /// Verifies that the chart can be deployed
     Check {
@@ -34,7 +34,7 @@ enum Command {
         profile: Option<String>,
 
         #[command(flatten)]
-        args: ActionArgs
+        args: ActionArgs,
     },
     /// Deploys helm chart by its deployment file
     Deploy {
@@ -43,7 +43,7 @@ enum Command {
         profile: Option<String>,
 
         #[command(flatten)]
-        args: ActionArgs
+        args: ActionArgs,
     },
     /// Cleans up any releases that are deployed but not defined
     Cleanup {
@@ -58,15 +58,13 @@ enum Command {
 
 #[derive(Debug, Args)]
 struct ActionArgs {
-
     /// Will not verify for deployments. Good for CI/CDs
     #[arg(long, short = 'y', action = ArgAction::SetTrue)]
     no_verify: bool,
-    
+
     /// Directory of deployment file
     dir: PathBuf,
 }
-
 
 fn main() -> Result<(), Box<dyn Error>> {
     let app = App::parse();

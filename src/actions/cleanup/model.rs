@@ -1,9 +1,9 @@
 use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
-use yaml_rust2::{Yaml, YamlLoader};
-use crate::command::Command;
 use crate::Error;
+use crate::command::Command;
+use yaml_rust2::{Yaml, YamlLoader};
 
 #[derive(Default)]
 pub(super) struct Releases {
@@ -17,12 +17,15 @@ impl Releases {
     }
 
     pub(super) fn difference(self, other: &Releases) -> Self {
-        let difference = self.content
+        let difference = self
+            .content
             .into_iter()
             .filter(|r| !other.content.contains(r))
             .collect();
 
-        Self { content: difference }
+        Self {
+            content: difference,
+        }
     }
 
     pub(super) fn undeploy(self, namespace: &str) -> Result<(), Error> {
@@ -53,13 +56,10 @@ impl FromStr for Releases {
 
         match yaml {
             Yaml::Array(releases) => {
-                let content = releases
-                    .iter()
-                    .filter_map(find_release_name)
-                    .collect();
+                let content = releases.iter().filter_map(find_release_name).collect();
                 Ok(Self { content })
-            },
-            _ => Ok(Self::default())
+            }
+            _ => Ok(Self::default()),
         }
     }
 }
@@ -73,7 +73,8 @@ fn create_undeploy(namespace: &str, release_name: &Release) -> Command {
 
 fn find_release_name(release: &Yaml) -> Option<String> {
     match release {
-        Yaml::Hash(hash) => hash.get(&Yaml::String("name".to_string()))
+        Yaml::Hash(hash) => hash
+            .get(&Yaml::String("name".to_string()))
             .and_then(|name| {
                 if let Yaml::String(name_str) = name {
                     Some(name_str.to_string())
@@ -81,14 +82,14 @@ fn find_release_name(release: &Yaml) -> Option<String> {
                     None
                 }
             }),
-        _ => None
+        _ => None,
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::actions::cleanup::model::Releases;
     use crate::Error;
+    use crate::actions::cleanup::model::Releases;
 
     type TestResult = Result<(), Box<dyn std::error::Error>>;
 
@@ -138,7 +139,10 @@ mod tests {
 
         // then
         assert!(result.is_err());
-        assert!(matches!(result.err().unwrap(), Error::CouldNotFigureOutReleaseName));
+        assert!(matches!(
+            result.err().unwrap(),
+            Error::CouldNotFigureOutReleaseName
+        ));
     }
 
     mod helper {
@@ -165,7 +169,8 @@ mod tests {
           revision: '3'
           status: deployed
           updated: 2025-02-24 14:29:36.687922 +0100 CET
-            ".to_string()
+            "
+            .to_string()
         }
     }
 }

@@ -1,4 +1,4 @@
-use crate::{Result, Error};
+use crate::{Error, Result};
 use std::path::PathBuf;
 use tracing::{debug, info};
 
@@ -23,7 +23,7 @@ pub fn profile(base_path: PathBuf, profile: &Option<String>) -> Result<Option<Pa
         }
 
         Ok(Some(values_profile))
-    } else { Ok(None) }
+    } else {
+        Ok(None)
+    }
 }
-
-

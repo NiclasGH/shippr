@@ -1,9 +1,9 @@
-use std::path::Path;
 use config::File;
 use serde::Deserialize;
+use std::path::Path;
 use tracing::{debug, warn};
 
-use crate::{command::Command, Error, Result};
+use crate::{Error, Result, command::Command};
 
 #[derive(Debug)]
 pub struct Deployment {
@@ -24,7 +24,9 @@ struct Release {
 }
 impl From<&str> for Release {
     fn from(value: &str) -> Self {
-        Release { name: value.to_string() }
+        Release {
+            name: value.to_string(),
+        }
     }
 }
 
@@ -45,14 +47,17 @@ impl Default for DeploymentFileName {
 impl Deployment {
     pub fn new(base_path: &Path, file_name: Option<DeploymentFileName>) -> Result<Self> {
         let directory_name = Self::dir_name(base_path)?;
-        let directory_path = base_path.as_os_str().to_str().ok_or(
-            Error::InvalidDirectory
-        )?;
+        let directory_path = base_path
+            .as_os_str()
+            .to_str()
+            .ok_or(Error::InvalidDirectory)?;
 
-        let file_name = file_name.unwrap_or_else(|| {
-            debug!("File name not provided. Taking default");
-            DeploymentFileName::default()
-        }).0;
+        let file_name = file_name
+            .unwrap_or_else(|| {
+                debug!("File name not provided. Taking default");
+                DeploymentFileName::default()
+            })
+            .0;
 
         let config_path = format!("{directory_path}/{file_name}");
 
@@ -62,17 +67,23 @@ impl Deployment {
             .try_deserialize()?;
 
         if chart.has_duplicate_location() {
-            warn!("The charts have a duplicate location. Please ensure your deployment file only has 1 location");
-            return Err(Error::DuplicateLocation)
+            warn!(
+                "The charts have a duplicate location. Please ensure your deployment file only has 1 location"
+            );
+            return Err(Error::DuplicateLocation);
         }
 
-        Ok(Deployment { release: Release::from(directory_name), chart })
+        Ok(Deployment {
+            release: Release::from(directory_name),
+            chart,
+        })
     }
     fn dir_name(path: &Path) -> Result<&str> {
-        let name = path.file_name()
+        let name = path
+            .file_name()
             .ok_or(Error::InvalidDirectory)?
-        .to_str()
-        .ok_or(Error::InvalidDirectory)?;
+            .to_str()
+            .ok_or(Error::InvalidDirectory)?;
         Ok(name)
     }
 
@@ -109,9 +120,7 @@ impl DeployChart {
         if let Some(v) = self.location.local.clone() {
             command.arg(v);
         } else if let Some(v) = self.location.repo.clone() {
-            command
-                .arg(&self.name)
-                .args(["--repo", &v]);
+            command.arg(&self.name).args(["--repo", &v]);
         }
     }
 }
@@ -125,8 +134,8 @@ impl Location {
 #[cfg(test)]
 mod tests {
     use std::io::Write;
-    use tempfile::Builder;
     use std::matches;
+    use tempfile::Builder;
 
     use super::{Deployment, DeploymentFileName};
     type TestResult = std::result::Result<(), Box<dyn std::error::Error>>;
@@ -147,14 +156,13 @@ mod tests {
         "#;
         writeln!(&mut deployment_file, "{}", file_content)?;
         let binding = deployment_file.into_temp_path();
-        let file_name = binding
-            .file_name()
-            .unwrap()
-            .to_str()
-            .unwrap();
+        let file_name = binding.file_name().unwrap().to_str().unwrap();
 
         // when
-        let result = Deployment::new(&std::env::temp_dir(), Some(DeploymentFileName(file_name.to_string())))?;
+        let result = Deployment::new(
+            &std::env::temp_dir(),
+            Some(DeploymentFileName(file_name.to_string())),
+        )?;
 
         // then
         assert_eq!(result.chart.name, "TestName");
@@ -162,7 +170,10 @@ mod tests {
         assert_eq!(result.chart.namespace, Some(String::from("TestNamespace")));
         assert_eq!(result.chart.location.repo, Some(String::from("TestRepo")));
         assert_eq!(result.chart.location.local, None);
-        assert_eq!(result.release.name, std::env::temp_dir().to_str().unwrap().to_string());
+        assert_eq!(
+            result.release.name,
+            std::env::temp_dir().to_str().unwrap().to_string()
+        );
 
         Ok(())
     }
@@ -184,17 +195,19 @@ mod tests {
         "#;
         writeln!(&mut deployment_file, "{}", file_content)?;
         let binding = deployment_file.into_temp_path();
-        let file_name = binding
-            .file_name()
-            .unwrap()
-            .to_str()
-            .unwrap();
+        let file_name = binding.file_name().unwrap().to_str().unwrap();
 
         // when
-        let result = Deployment::new(&std::env::temp_dir(), Some(DeploymentFileName(file_name.to_string())));
+        let result = Deployment::new(
+            &std::env::temp_dir(),
+            Some(DeploymentFileName(file_name.to_string())),
+        );
 
         // then
-        assert!(matches!(result.err(), Some(crate::Error::DuplicateLocation)));
+        assert!(matches!(
+            result.err(),
+            Some(crate::Error::DuplicateLocation)
+        ));
 
         Ok(())
     }
@@ -202,7 +215,7 @@ mod tests {
 
 #[cfg(test)]
 pub mod test_fixtures {
-    use super::{Deployment, Release, DeployChart, Location};
+    use super::{DeployChart, Deployment, Location, Release};
 
     pub fn deployment() -> Deployment {
         Deployment {

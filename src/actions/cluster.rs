@@ -1,4 +1,4 @@
-use crate::{command::Command, Result};
+use crate::{Result, command::Command};
 
 use tracing::debug;
 
@@ -11,10 +11,7 @@ pub fn set_cluster(name: &str) -> Result<()> {
 
 fn create_set_cluster(name: &str) -> Command {
     let mut command = Command::new("kubectl");
-    command
-        .arg("config")
-        .arg("use-context")
-        .arg(name);
+    command.arg("config").arg("use-context").arg(name);
 
     command
 }
