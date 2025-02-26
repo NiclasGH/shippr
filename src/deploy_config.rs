@@ -1,12 +1,11 @@
 use std::path::Path;
-
 use config::File;
 use serde::Deserialize;
 use tracing::{debug, warn};
 
 use crate::{command::Command, Error, Result};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug)]
 pub struct Deployment {
     release: Release,
     chart: DeployChart,
@@ -18,11 +17,17 @@ struct DeployChart {
     namespace: Option<String>,
     location: Location,
 }
-#[derive(Debug, Deserialize)]
+#[derive(Debug)]
 struct Release {
     //image: String, this is a possible extension. Use values files for now
-    release_name: String,
+    name: String,
 }
+impl From<&str> for Release {
+    fn from(value: &str) -> Self {
+        Release { name: value.to_string() }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 struct Location {
     repo: Option<String>,
@@ -39,7 +44,7 @@ impl Default for DeploymentFileName {
 
 impl Deployment {
     pub fn new(base_path: &Path, file_name: Option<DeploymentFileName>) -> Result<Self> {
-        let directory_string = base_path.as_os_str().to_str().ok_or(
+        let directory_str = base_path.as_os_str().to_str().ok_or(
             Error::InvalidDirectory
         )?;
 
@@ -48,30 +53,31 @@ impl Deployment {
             DeploymentFileName::default()
         }).0;
 
-        let config_path = format!("{directory_string}/{file_name}");
+        let config_path = format!("{directory_str}/{file_name}");
 
-        let config: Self = config::Config::builder()
+        let chart: DeployChart = config::Config::builder()
             .add_source(File::with_name(&config_path))
             .build()?
             .try_deserialize()?;
 
-        if config.chart.has_duplicate_location() {
+        if chart.has_duplicate_location() {
             warn!("The charts have a duplicate location. Please ensure your deployment file only has 1 location");
             return Err(Error::DuplicateLocation)
         }
 
-        Ok(config)
+        Ok(Deployment { release: directory_str.into(), chart })
     }
 
     pub fn append_deployment_information(&self, command: &mut Command) {
-        self.release.append_release_information(command);
         self.chart.append_chart_information(command);
+        self.release.append_release_information(command);
+        self.chart.append_chart_location(command);
     }
 }
 
 impl Release {
     fn append_release_information(&self, command: &mut Command) {
-        command.arg(&self.release_name);
+        command.arg(&self.name);
     }
 }
 
@@ -81,8 +87,6 @@ impl DeployChart {
     }
 
     fn append_chart_information(&self, command: &mut Command) {
-        command.arg(&self.name);
-
         if let Some(version) = &self.version {
             command.args(["--version", version]);
         }
@@ -91,15 +95,15 @@ impl DeployChart {
             command.args(["--namespace", namespace]);
             command.arg("--create-namespace");
         }
-
-        self.append_chart_location(command);
     }
 
     fn append_chart_location(&self, command: &mut Command) {
         if let Some(v) = self.location.local.clone() {
             command.arg(v);
         } else if let Some(v) = self.location.repo.clone() {
-            command.args(["--repo", &v]);
+            command
+                .arg(&self.name)
+                .args(["--repo", &v]);
         }
     }
 }
@@ -127,15 +131,11 @@ mod tests {
             .suffix(".yaml")
             .tempfile()?;
         let file_content = r#"
-        release:
-            release_name: TestRelease
-
-        chart:
-            name: TestName
-            version: TestVersion
-            namespace: TestNamespace
-            location:
-                repo: TestRepo
+        name: TestName
+        version: TestVersion
+        namespace: TestNamespace
+        location:
+            repo: TestRepo
         "#;
         writeln!(&mut deployment_file, "{}", file_content)?;
         let binding = deployment_file.into_temp_path();
@@ -154,7 +154,7 @@ mod tests {
         assert_eq!(result.chart.namespace, Some(String::from("TestNamespace")));
         assert_eq!(result.chart.location.repo, Some(String::from("TestRepo")));
         assert_eq!(result.chart.location.local, None);
-        assert_eq!(result.release.release_name, String::from("TestRelease"));
+        assert_eq!(result.release.name, std::env::temp_dir().to_str().unwrap().to_string());
 
         Ok(())
     }
@@ -167,16 +167,12 @@ mod tests {
             .suffix(".yaml")
             .tempfile()?;
         let file_content = r#"
-        release:
-            release_name: TestRelease
-
-        chart:
-            name: TestName
-            version: TestVersion
-            namespace: TestNamespace
-            location:
-                repo: TestRepo
-                local: TestPath
+        name: TestName
+        version: TestVersion
+        namespace: TestNamespace
+        location:
+            repo: TestRepo
+            local: TestPath
         "#;
         writeln!(&mut deployment_file, "{}", file_content)?;
         let binding = deployment_file.into_temp_path();
@@ -203,7 +199,7 @@ pub mod test_fixtures {
     pub fn deployment() -> Deployment {
         Deployment {
             release: Release {
-                release_name: String::from("TestRelease"),
+                name: String::from("TestRelease"),
             },
             chart: DeployChart {
                 name: String::from("TestChartName"),

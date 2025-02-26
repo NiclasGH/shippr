@@ -36,8 +36,8 @@ impl Command {
 
     /// No-value return
     pub fn execute(mut self) -> Result<()> {
-        let program = self.command.get_program();
-        info!("Running command {:?}", program);
+        info!("Running command {:?}", self.command.get_program());
+        info!("Command args: {:?}", self.command.get_args());
 
         let output = self.command.output()?;
         stdout().write_all(&output.stdout)?;
@@ -48,8 +48,8 @@ impl Command {
 
     /// stdout return
     pub fn output(mut self) -> Result<String> {
-        let program = self.command.get_program();
-        info!("Running command {:?}", program);
+        info!("Running command {:?}", self.command.get_program());
+        info!("Command args: {:?}", self.command.get_args());
 
         let output = self.command.output()?;
         stderr().write_all(&output.stderr)?;

@@ -1,9 +1,6 @@
-release_name: my-nginx
-
-chart:
-    name: nginx
-    version: 1.0.0
-    namespace: dev
-    location:
-        local: /home/niclas/dev/shippr/test_charts/nginx
+name: nginx
+version: 1.0.0
+namespace: dev
+location:
+    local: /home/niclas/dev/shippr/test_charts/nginx
 

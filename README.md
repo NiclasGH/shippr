@@ -13,17 +13,12 @@ The deployment file supports the following file formats: TOML, JSON, YAML, INI, 
 
 In there you simply need the following structure (example in yaml):
 ```yaml
-release:
-    image: full/path/to/image:52                                # Optional - possible extension. First version will use the values file
-    release_name: my-app                                        # Required - As a possible extension it can use the directory name. Or default?
-
-chart:
-    name: ingress-nginx                                     # Required
-    version: 1.12.0                                         # Optional
-    namespace: ingress-nginx                                # Optional
-    location:                                               # Required - At least one
-        repo: https://kubernetes.github.io/ingress-nginx
-        local: /home/user/charts/ingress-nginx
+name: ingress-nginx                                     # Required
+version: 1.12.0                                         # Optional
+namespace: ingress-nginx                                # Optional
+location:                                               # Required - At least one
+  repo: https://kubernetes.github.io/ingress-nginx
+  local: /home/user/charts/ingress-nginx
 ```
 For the location, repo will be prioritized
 

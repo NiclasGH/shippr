@@ -28,17 +28,15 @@ fn create_deploy(
     values_profile: Option<PathBuf>
 ) -> Command {
     let mut command = Command::new("helm");
-    command.args(["upgrade", "--install"]);
-    deployment.append_deployment_information(&mut command);
-
     command
+        .args(["upgrade", "--install"])
+        .arg("--wait")
         .args(["-f", values_default.to_str().unwrap()]);
 
     if let Some(p) = values_profile {
         command.args(["-f", p.to_str().unwrap()]);
     }
-
-    command.arg("--wait");
+    deployment.append_deployment_information(&mut command);
 
     command
 }
@@ -66,13 +64,14 @@ mod tests {
         // then
         assert_eq!(result.get_program(), "helm");
         assert_eq!(result.get_args(), [
-            "upgrade", "--install", "TestRelease", "TestChartName",
+            "upgrade", "--install",
+            "--wait",
+            "-f", "values-default.yaml",
             "--version", "TestVersion",
             "--namespace", "TestNamespace",
             "--create-namespace",
+            "TestRelease", "TestChartName",
             "--repo", "TestRepo",
-            "-f", "values-default.yaml",
-            "--wait",
         ]);
 
         Ok(())
@@ -92,14 +91,15 @@ mod tests {
         // then
         assert_eq!(result.get_program(), "helm");
         assert_eq!(result.get_args(), [
-            "upgrade", "--install", "TestRelease", "TestChartName",
+            "upgrade", "--install",
+            "--wait",
+            "-f", "values-default.yaml",
+            "-f", "values-test.yaml",
             "--version", "TestVersion",
             "--namespace", "TestNamespace",
             "--create-namespace",
+            "TestRelease", "TestChartName",
             "--repo", "TestRepo",
-            "-f", "values-default.yaml",
-            "-f", "values-test.yaml",
-            "--wait",
         ]);
 
         Ok(())

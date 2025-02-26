@@ -6,7 +6,7 @@
 - [x] Implement deploy
 - [ ] Implement the no-verify option
 - [x] Implement profile option
-- [ ] Implement cleanup
+- [x] Implement cleanup
 - [x] Implement cluster
 - [ ] Create guide for simple Dockerfile
 
