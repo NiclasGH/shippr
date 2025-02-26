@@ -20,7 +20,7 @@ location:                                               # Required - At least on
   repo: https://kubernetes.github.io/ingress-nginx
   local: /home/user/charts/ingress-nginx
 ```
-For the location, repo will be prioritized
+For the location, only one can be provided
 
 ## Usage
 **shippr**
@@ -42,4 +42,4 @@ shippr[EXE] [OPTIONS]
 ```
 
 ## Docker
-**TODO** here you can find a leightweight docker image for use in pipelines. It has kubectl, helm and shippr pre-installed. Most likely debian based
+The docker image is made to be used in CI/CD pipelines. It contains helm, kubectl and shippr
