@@ -13,7 +13,8 @@ pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf) -> Result<()> {
     let values_default = values::default(deploy_file_dir.clone())?;
     let values_profile = values::profile(deploy_file_dir, &profile)?;
 
-    if !user_confirmation("Do you really want to deploy with the following profile: {profile:?}")? {
+    let prompt = format!("Do you really want to deploy with the following profile: {profile:?}: [Y/N]");
+    if !user_confirmation(&prompt)? {
         return Ok(());
     }
 

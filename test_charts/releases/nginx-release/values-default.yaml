@@ -1,2 +1,2 @@
 imageName: nginx:latest
-name: defaultNginx
+name: default-nginx

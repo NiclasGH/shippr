@@ -1,6 +1,0 @@
-name: nginx
-version: 1.0.0
-namespace: dev
-location:
-    local: /home/niclas/dev/shippr/test_charts/nginx
-

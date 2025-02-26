@@ -44,7 +44,8 @@ impl Default for DeploymentFileName {
 
 impl Deployment {
     pub fn new(base_path: &Path, file_name: Option<DeploymentFileName>) -> Result<Self> {
-        let directory_str = base_path.as_os_str().to_str().ok_or(
+        let directory_name = Self::dir_name(base_path)?;
+        let directory_path = base_path.as_os_str().to_str().ok_or(
             Error::InvalidDirectory
         )?;
 
@@ -53,7 +54,7 @@ impl Deployment {
             DeploymentFileName::default()
         }).0;
 
-        let config_path = format!("{directory_str}/{file_name}");
+        let config_path = format!("{directory_path}/{file_name}");
 
         let chart: DeployChart = config::Config::builder()
             .add_source(File::with_name(&config_path))
@@ -65,7 +66,14 @@ impl Deployment {
             return Err(Error::DuplicateLocation)
         }
 
-        Ok(Deployment { release: directory_str.into(), chart })
+        Ok(Deployment { release: Release::from(directory_name), chart })
+    }
+    fn dir_name(path: &Path) -> Result<&str> {
+        let name = path.file_name()
+            .ok_or(Error::InvalidDirectory)?
+        .to_str()
+        .ok_or(Error::InvalidDirectory)?;
+        Ok(name)
     }
 
     pub fn append_deployment_information(&self, command: &mut Command) {
