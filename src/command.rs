@@ -45,6 +45,17 @@ impl Command {
 
         Ok(())
     }
+
+    /// stdout return
+    pub fn output(mut self) -> Result<String> {
+        let program = self.command.get_program();
+        info!("Running command {:?}", program);
+
+        let output = self.command.output()?;
+        stderr().write_all(&output.stderr)?;
+
+        Ok(String::from_utf8(output.stdout)?)
+    }
 }
 
 #[cfg(test)]

@@ -48,27 +48,3 @@ shippr[EXE] [OPTIONS]
 
 ## Docker
 **TODO** here you can find a leightweight docker image for use in pipelines. It has kubectl, helm and shippr pre-installed. Most likely debian based
-
-## Under the hood commands:
-Cleanup
-```bash
-# Known releases
-known = for dir in ls {
-    read deployment file and take release_name
-}
-
-released = helm list --namespace <NAMESPACE> -o yaml (deseralize)
-
-for release in released {
-    if not in known {
-        undeploy
-    }
-}
-
-
-
-
-
-
-
-

@@ -1,18 +1,41 @@
+use std::fmt::{Display, Formatter};
 use std::str::FromStr;
 
 use yaml_rust2::{Yaml, YamlLoader};
-
+use crate::command::Command;
 use crate::Error;
 
+#[derive(Default)]
 pub(super) struct Releases {
     content: Vec<Release>,
 }
 pub(super) type Release = String;
 
+impl Releases {
+    pub(super) fn new(content: Vec<String>) -> Self {
+        Releases { content }
+    }
 
-impl Default for Releases {
-    fn default() -> Self {
-        Self { content: Vec::new(), }
+    pub(super) fn difference(self, other: &Releases) -> Self {
+        let difference = self.content
+            .into_iter()
+            .filter(|r| !other.content.contains(r))
+            .collect();
+
+        Self { content: difference }
+    }
+
+    pub(super) fn undeploy(self, namespace: &str) -> Result<(), Error> {
+        for release in &self.content {
+            create_undeploy(namespace, release).execute()?;
+        }
+        Ok(())
+    }
+}
+
+impl Display for Releases {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.content.join(" "))
     }
 }
 
@@ -39,6 +62,13 @@ impl FromStr for Releases {
             _ => Ok(Self::default())
         }
     }
+}
+
+fn create_undeploy(namespace: &str, release_name: &Release) -> Command {
+    let mut command = Command::new("helm");
+    command.args(["uninstall", release_name]);
+    command.args(["--namespace", namespace]);
+    command
 }
 
 fn find_release_name(release: &Yaml) -> Option<String> {
