@@ -16,7 +16,7 @@ pub fn cleanup(namespace: String, dir: PathBuf, no_verify: bool) -> Result<()> {
     let difference = currently_released.difference(&defined_releases);
     if difference.len() == 0 {
         println!("Nothing to cleanup");
-        return Ok(())
+        return Ok(());
     }
 
     let user_confirm = format!(

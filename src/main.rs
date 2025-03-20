@@ -6,7 +6,9 @@ use clap::{ArgAction, Args, Parser, Subcommand};
 #[clap(version)]
 /// A simple binary to manage your helmcharts.
 struct App {
-    /// Sets verbosity level. Can be used multiple times for more detail [e.g. -vvvv].
+    // Yes this could be a SetTrue, but I liked the solution, but the logging isnt complex enough
+    // to make it multi-level
+    /// Enables verbose logging.
     /// [Default: ERROR logs]
     #[arg(
         global = true,
@@ -73,20 +75,23 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     match app.command {
         Command::Check { profile, args } => shippr::actions::check(profile, args.dir)?,
-        Command::Cleanup { namespace, args } => shippr::actions::cleanup(namespace, args.dir, args.no_verify)?,
+        Command::Cleanup { namespace, args } => {
+            shippr::actions::cleanup(namespace, args.dir, args.no_verify)?
+        }
         Command::Cluster { name } => shippr::actions::set_cluster(&name)?,
-        Command::Deploy { profile, args } => shippr::actions::deploy(profile, args.dir, args.no_verify)?,
+        Command::Deploy { profile, args } => {
+            shippr::actions::deploy(profile, args.dir, args.no_verify)?
+        }
     }
 
     Ok(())
 }
 
 fn setup_logger(app: &App) {
-    let log_level = match app.verbose {
-        0 => tracing::Level::ERROR,
-        1 => tracing::Level::WARN,
-        2 => tracing::Level::INFO,
-        3.. => tracing::Level::DEBUG,
+    let log_level = if app.verbose == 0 {
+        tracing::Level::ERROR
+    } else {
+        tracing::Level::DEBUG
     };
     tracing_subscriber::fmt()
         .compact()

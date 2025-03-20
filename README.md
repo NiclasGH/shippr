@@ -24,20 +24,21 @@ location:                                               # Required - Exactly one
 ## Usage
 **shippr**
 ```
-shippr[EXE] [OPTIONS]
-    install [kube|helm]     Deploys kubectl or helm
-    
-    cluster <CLUSTER>       Sets the current cluster [default: "."]
-    check <DIR>             Performs a dry run to check that everything works [default: "."]
-    deploy <DIR>            Deploys the application in the specified directory [default: "."]
-    cleanup <DIR>           Compares the deployed releases with the applications in the current directory. 
-                            Undeploys if the directory doesn't contain the release. [default: "."]
-        -n, --namespace     Only cleans up a specified namespace
-    
-    -y, --no-verify         Deploys/Undeploys without confirming the action
-    -p, --profile <NAME>    Deploys in a specific profile (e.g. dev/prod etc.)
-    -h, --help              Print help
-    -V, --version           Print version
+Usage: shippr [OPTIONS] <COMMAND>
+
+Commands:
+  cluster <NAME>    Configures the cluster
+  check <DIR>       Verifies that the chart can be deployed
+  deploy <DIR>      Deploys helm chart by its deployment file
+  cleanup <DIR>     Cleans up any releases that are deployed but not defined
+    -n <NAMESPACE>  Namespace to cleanup
+
+  help              Print this message or the help of the given subcommand(s)
+
+Options:
+  -v, --verbose...  Enables verbose logging. [Default: ERROR logs]
+  -h, --help        Print help
+  -V, --version     Print version
 ```
 
 ## Docker
