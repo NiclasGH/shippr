@@ -170,10 +170,10 @@ mod tests {
         assert_eq!(result.chart.namespace, Some(String::from("TestNamespace")));
         assert_eq!(result.chart.location.repo, Some(String::from("TestRepo")));
         assert_eq!(result.chart.location.local, None);
-        assert_eq!(
-            result.release.name,
-            std::env::temp_dir().to_str().unwrap().to_string()
-        );
+
+        let temp_dir = std::env::temp_dir();
+        let temp_dir_name = temp_dir.file_name().unwrap().to_str().unwrap();
+        assert_eq!(result.release.name, temp_dir_name);
 
         Ok(())
     }
