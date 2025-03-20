@@ -1,6 +1,6 @@
 # shippr
 A simple binary to manage your helmcharts.
-Often you dont write a helmchart simply to deploy it but often you re-use it for multiple deployments or you slightly adjust it different on different machines. shippr wants to support this by adding the concept of a new file: `deployment`. For your applications, split helmcharts and deployments. In a given directory you will find at minimum 2 things:
+Often you dont write a helmchart simply to deploy it but often you re-use it for multiple deployments or you slightly adjust it differently on different machines. shippr wants to support this by adding the concept of a new file: `deployment`. For your applications, split helmcharts and deployments. In a given directory you will find at minimum 2 things:
 1. A deployment file, that specifies the helmchart and version
 2. A `values-default.yaml`.
 
@@ -16,11 +16,10 @@ In there you simply need the following structure (example in yaml):
 name: ingress-nginx                                     # Required
 version: 1.12.0                                         # Optional
 namespace: ingress-nginx                                # Optional
-location:                                               # Required - At least one
+location:                                               # Required - Exactly one
   repo: https://kubernetes.github.io/ingress-nginx
   local: /home/user/charts/ingress-nginx
 ```
-For the location, only one can be provided
 
 ## Usage
 **shippr**
