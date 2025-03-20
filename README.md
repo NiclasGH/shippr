@@ -42,3 +42,9 @@ shippr[EXE] [OPTIONS]
 
 ## Docker
 The docker image is made to be used in CI/CD pipelines. It contains helm, kubectl and shippr
+
+## Developing
+It is recommended to enable the githooks to prevent the CI failing on your after you push.
+```bash
+git config --local core.hooksPath .githooks/
+```
