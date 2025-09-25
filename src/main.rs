@@ -47,7 +47,10 @@ enum Command {
         #[command(flatten)]
         args: ActionArgs,
     },
-    /// Cleans up any releases that are deployed but not defined
+    /// Cleans up any releases that are deployed but not defined.
+    /// For this it uses the given namespace and the context directory.
+    /// It reads the folder names of the context directories
+    /// and compares them with the release-names in the given namespace.
     Cleanup {
         #[command(flatten)]
         args: ActionArgs,
@@ -64,7 +67,8 @@ struct ActionArgs {
     #[arg(long, short = 'y', action = ArgAction::SetTrue)]
     no_verify: bool,
 
-    /// Directory of deployment file
+    /// Context directory. Should be the location of the deployment.yaml for deployments
+    /// and the namespace directory for cleanups
     dir: PathBuf,
 }
 
