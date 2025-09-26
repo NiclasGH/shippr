@@ -25,6 +25,11 @@ struct App {
 
 #[derive(Debug, Subcommand)]
 enum Command {
+    /// Initialized deployment configuration in current directory
+    Init {
+        /// Name of resource to be deployed
+        name: String
+    },
     /// Configures the cluster
     Cluster {
         #[command(subcommand)]
@@ -95,6 +100,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     command_available("helm")?;
 
     match app.command {
+        Command::Init { name: _ } => todo!("Unimplemented"),
+
         Command::Check { profile, args } => shippr::actions::check(profile, args.dir)?,
 
         Command::Cleanup {
