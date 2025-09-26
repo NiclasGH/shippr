@@ -59,7 +59,8 @@ jobs:
       - name: Linting
         run: cargo clippy --all -- -D warnings
 
-  compile:
+  release:
+    if: github.ref_type == 'tag'
     needs: [test, fmt, clippy]
     name: Release - ${{ matrix.platform.os-name }}
     strategy:
@@ -113,7 +114,6 @@ jobs:
         with:
           name: shippr-${{ matrix.platform.os_name }}
           path: "shippr*"
-        if: github.ref_type == 'tag'
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
@@ -123,4 +123,3 @@ jobs:
             shippr*
             LICENSE
           # body_path: Changes.md
-        if: github.ref_type == 'tag'
