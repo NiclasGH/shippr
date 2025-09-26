@@ -1,6 +1,7 @@
-use std::{error::Error, path::PathBuf};
+use std::{error::Error, path::PathBuf, process};
 
 use clap::{ArgAction, Args, Parser, Subcommand};
+use tracing::error;
 
 #[derive(Debug, Parser)]
 #[clap(version)]
@@ -90,6 +91,9 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     setup_logger(&app);
 
+    command_available("kubectl")?;
+    command_available("helm")?;
+
     match app.command {
         Command::Check { profile, args } => shippr::actions::check(profile, args.dir)?,
 
@@ -103,7 +107,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             } else if all_namespaces {
                 shippr::actions::cleanup_all_namespaces(args.dir, args.no_verify)?
             } else {
-                return Err(Box::new(shippr::Error::NoNamespacePassed));
+                return Err(shippr::Error::NoNamespacePassed.into());
             }
         }
 
@@ -132,4 +136,18 @@ fn setup_logger(app: &App) {
         .with_file(false)
         .without_time()
         .init();
+}
+
+fn command_available(command: &str) -> Result<(), Box<dyn Error>> {
+    let output = process::Command::new(command)
+        .arg("version")
+        .output()
+        .map_err(|_| shippr::Error::MissingTool(command.to_string()))?;
+
+    if output.status.success() {
+        Ok(())
+    } else {
+        error!("{output:?}");
+        Err(shippr::Error::FaultyTool(command.to_string()).into())
+    }
 }

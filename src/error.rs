@@ -13,6 +13,12 @@ pub enum Error {
     #[error("Both the local and repository location are set. Only one can be set")]
     DuplicateLocation,
 
+    #[error("{0} is not installed")]
+    MissingTool(String),
+
+    #[error("{0} is installed but is not working properly")]
+    FaultyTool(String),
+
     #[error("The values-default.yaml file does not exist: path: {0}")]
     ValuesDefaultMissing(PathBuf),
 
