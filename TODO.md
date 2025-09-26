@@ -1,3 +1,2 @@
-- The ability to just cleanup all directories. Useful for small clusters
 - Ability to list available clusters
 - Auto build github action

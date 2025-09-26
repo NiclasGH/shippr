@@ -6,7 +6,8 @@ pub use cleanup::action::cleanup_all_namespaces;
 pub use cleanup::action::cleanup_namespace;
 
 mod cluster;
-pub use cluster::set_cluster;
+pub use cluster::list::list_clusters;
+pub use cluster::set::set_cluster;
 
 mod deploy;
 pub use deploy::deploy;

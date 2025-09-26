@@ -26,8 +26,8 @@ struct App {
 enum Command {
     /// Configures the cluster
     Cluster {
-        /// Name of the cluster/context to use
-        name: String,
+        #[command(subcommand)]
+        cluster_command: ClusterCommand,
     },
     /// Verifies that the chart can be deployed
     Check {
@@ -66,6 +66,14 @@ enum Command {
     },
 }
 
+#[derive(Debug, Subcommand)]
+enum ClusterCommand {
+    /// List available clusters
+    List,
+    /// Set the currently active cluster
+    Set { name: String },
+}
+
 #[derive(Debug, Args)]
 struct ActionArgs {
     /// Will not verify for deployments. Good for CI/CDs
@@ -99,7 +107,10 @@ fn main() -> Result<(), Box<dyn Error>> {
             }
         }
 
-        Command::Cluster { name } => shippr::actions::set_cluster(&name)?,
+        Command::Cluster { cluster_command } => match cluster_command {
+            ClusterCommand::List => shippr::actions::list_clusters()?,
+            ClusterCommand::Set { name } => shippr::actions::set_cluster(&name)?,
+        },
 
         Command::Deploy { profile, args } => {
             shippr::actions::deploy(profile, args.dir, args.no_verify)?

@@ -18,7 +18,7 @@ fn create_set_cluster(name: &str) -> Command {
 
 #[cfg(test)]
 mod test {
-    use crate::actions::cluster::create_set_cluster;
+    use super::create_set_cluster;
 
     type TestResult = std::result::Result<(), Box<dyn std::error::Error>>;
 
