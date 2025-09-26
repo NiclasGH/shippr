@@ -108,8 +108,17 @@ jobs:
           args: "--locked --release"
           strip: true
 
-      - name: Publish artifacts and release
-        uses: houseabsolute/actions-rust-release@v0
+      - name: Publish release artifacts
+        uses: actions/upload-artifact@v3
         with:
-          executable-name: shippr
-          target: ${{ matrix.platform.target }}
+          name: shippr-${{ matrix.platform.os_name }}
+          path: "shippr*"
+        if: github.ref_type == 'tag'
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: "shippr*"
+          body_path: Changes.md
+        if: github.ref_type == 'tag'
