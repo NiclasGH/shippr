@@ -1,2 +1,3 @@
-- Init
+- Add warn that no namespace was passed
+- Allow . as path
 - Auto build github action
