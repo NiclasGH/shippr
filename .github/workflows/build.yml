@@ -98,6 +98,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - uses: Swatinem/rust-cache@v2
+
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v1
         with:
