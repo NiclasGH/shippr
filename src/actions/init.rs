@@ -56,7 +56,7 @@ fn create_default_deployment(deployment_name: &str) -> String {
     format!(
         r#"name: {deployment_name}
 version: 1.0
-# namespace: default
+namespace: default
 location: # TODO replace with actual location
   # repo: https://artifacthub.io/{deployment_name}
   # local: /home/root/charts/{deployment_name}"#

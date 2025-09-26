@@ -15,7 +15,7 @@ In there you simply need the following structure (example in yaml):
 ```yaml
 name: ingress-nginx                                     # Required / Name under which the Chart is being released
 version: 1.12.0                                         # Optional / Version of the Chart
-namespace: ingress-nginx                                # Optional / Namespace in which the Chart is being released
+namespace: ingress-nginx                                # Required / Namespace in which the Chart is being released
 location:                                               # Required - Exactly one / Location where to find the Chart
   repo: https://kubernetes.github.io/ingress-nginx
   local: /home/user/charts/ingress-nginx

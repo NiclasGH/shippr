@@ -14,7 +14,7 @@ pub struct Deployment {
 struct DeployChart {
     name: String,
     version: Option<String>,
-    namespace: Option<String>,
+    namespace: String,
     location: Location,
 }
 #[derive(Debug)]
@@ -110,10 +110,8 @@ impl DeployChart {
             command.args(["--version", version]);
         }
 
-        if let Some(namespace) = &self.namespace {
-            command.args(["--namespace", namespace]);
-            command.arg("--create-namespace");
-        }
+        command.args(["--namespace", &self.namespace]);
+        command.arg("--create-namespace");
     }
 
     fn append_chart_location(&self, command: &mut Command) {
@@ -167,7 +165,7 @@ mod tests {
         // then
         assert_eq!(result.chart.name, "TestName");
         assert_eq!(result.chart.version, Some(String::from("TestVersion")));
-        assert_eq!(result.chart.namespace, Some(String::from("TestNamespace")));
+        assert_eq!(result.chart.namespace, String::from("TestNamespace"));
         assert_eq!(result.chart.location.repo, Some(String::from("TestRepo")));
         assert_eq!(result.chart.location.local, None);
 
@@ -225,7 +223,7 @@ pub mod test_fixtures {
             chart: DeployChart {
                 name: String::from("TestChartName"),
                 version: Some(String::from("TestVersion")),
-                namespace: Some(String::from("TestNamespace")),
+                namespace: String::from("TestNamespace"),
                 location: Location {
                     repo: Some(String::from("TestRepo")),
                     local: None,

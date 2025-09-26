@@ -16,13 +16,14 @@ pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf, no_verify: bool
     let values_default = values::default(deploy_file_dir.clone())?;
     let values_profile = values::profile(deploy_file_dir, &profile)?;
 
-    let prompt =
-        format!("Do you really want to deploy with the following profile: {profile:?}: [Y/N]");
+    let prompt = format!(
+        "Do you really want to deploy? Please verify the configured namespace. profile: {profile:?}: [Y/N]"
+    );
     if !no_verify && !user_confirmation(&prompt)? {
         return Ok(());
     }
 
-    println!("Deploying chart.");
+    println!("Deploying chart. This can take up to 3 minutes");
     create_deploy(deployment, values_default, values_profile).execute()?;
 
     Ok(())
@@ -37,6 +38,7 @@ fn create_deploy(
     command
         .args(["upgrade", "--install"])
         .arg("--wait")
+        .args(["--timeout", "180"])
         .args(["-f", values_default.to_str().unwrap()]);
 
     if let Some(p) = values_profile {
