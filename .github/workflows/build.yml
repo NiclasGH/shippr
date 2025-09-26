@@ -119,6 +119,8 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           draft: true
-          files: "shippr*"
-          body_path: Changes.md
+          files: |
+            shippr*
+            LICENSE
+          # body_path: Changes.md
         if: github.ref_type == 'tag'
