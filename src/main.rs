@@ -1,6 +1,7 @@
 use std::{error::Error, path::PathBuf};
 
 use clap::{ArgAction, Args, Parser, Subcommand};
+use tracing::warn;
 
 #[derive(Debug, Parser)]
 #[clap(version)]
@@ -55,9 +56,13 @@ enum Command {
         #[command(flatten)]
         args: ActionArgs,
 
+        /// Cleanup all namespaces
+        #[arg(long, short = 'A', action = ArgAction::SetTrue)]
+        all_namespaces: bool,
+
         /// Namespace to cleanup.
         #[arg(long, short = 'n')]
-        namespace: String,
+        namespace: Option<String>,
     },
 }
 
@@ -79,10 +84,23 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     match app.command {
         Command::Check { profile, args } => shippr::actions::check(profile, args.dir)?,
-        Command::Cleanup { namespace, args } => {
-            shippr::actions::cleanup(namespace, args.dir, args.no_verify)?
+
+        Command::Cleanup {
+            namespace,
+            all_namespaces,
+            args,
+        } => {
+            if !all_namespaces && namespace.is_some() {
+                shippr::actions::cleanup_namespace(namespace.unwrap(), args.dir, args.no_verify)?
+            } else if all_namespaces {
+                warn!("Unimplemented cleanup all namespaces")
+            } else {
+                return Err(Box::new(shippr::Error::NoNamespacePassed));
+            }
         }
+
         Command::Cluster { name } => shippr::actions::set_cluster(&name)?,
+
         Command::Deploy { profile, args } => {
             shippr::actions::deploy(profile, args.dir, args.no_verify)?
         }

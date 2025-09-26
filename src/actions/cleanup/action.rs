@@ -5,7 +5,7 @@ use crate::io::user_confirmation;
 use log::debug;
 use std::path::PathBuf;
 
-pub fn cleanup(namespace: String, dir: PathBuf, no_verify: bool) -> Result<()> {
+pub fn cleanup_namespace(namespace: String, dir: PathBuf, no_verify: bool) -> Result<()> {
     debug!(
         "Received the following parameters: namespace: [{:?}], dir: [{:?}]",
         namespace, dir
@@ -19,10 +19,7 @@ pub fn cleanup(namespace: String, dir: PathBuf, no_verify: bool) -> Result<()> {
         return Ok(());
     }
 
-    let user_confirm = format!(
-        "The following would be undeployed: {}: Proceed? [Y/N]",
-        difference
-    );
+    let user_confirm = format!("The following would be undeployed: {difference}: Proceed? [Y/N]");
     if !no_verify && !user_confirmation(&user_confirm)? {
         return Ok(());
     }

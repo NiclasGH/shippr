@@ -34,7 +34,7 @@ impl Releases {
 
     pub(super) fn undeploy(self, namespace: &str) -> Result<(), Error> {
         for release in &self.content {
-            println!("Undeploying {}", release);
+            println!("Undeploying {release}");
             create_undeploy(namespace, release).execute()?;
         }
         Ok(())
