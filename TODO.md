@@ -1,2 +1,2 @@
-- Ability to list available clusters
+- Init
 - Auto build github action
