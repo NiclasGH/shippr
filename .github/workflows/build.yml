@@ -109,14 +109,14 @@ jobs:
           strip: true
 
       - name: Publish release artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: shippr-${{ matrix.platform.os_name }}
           path: "shippr*"
         if: github.ref_type == 'tag'
 
       - name: Publish GitHub release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
           files: |
