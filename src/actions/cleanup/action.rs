@@ -6,10 +6,7 @@ use log::debug;
 use std::path::PathBuf;
 
 pub fn cleanup_all_namespaces(dir: PathBuf, no_verify: bool) -> Result<()> {
-    debug!(
-        "Received the following parameters: all-namespace: [true], dir: [{:?}]",
-        dir
-    );
+    debug!("Received the following parameters: all-namespace: [true], dir: [{dir:?}]");
     let currently_released = find_currently_released_in_all_namespace()?;
     let defined_releases = find_defined_releases(dir)?;
 
@@ -30,8 +27,7 @@ pub fn cleanup_all_namespaces(dir: PathBuf, no_verify: bool) -> Result<()> {
 
 pub fn cleanup_namespace(namespace: String, dir: PathBuf, no_verify: bool) -> Result<()> {
     debug!(
-        "Received the following parameters: all-namespaces: [false] namespace: [{:?}], dir: [{:?}]",
-        namespace, dir
+        "Received the following parameters: all-namespaces: [false] namespace: [{namespace:?}], dir: [{dir:?}]"
     );
     let currently_released = find_currently_released_in_namespace(&namespace)?;
     let defined_releases = find_defined_releases(dir)?;
