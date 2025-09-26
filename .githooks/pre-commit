@@ -1,3 +1,4 @@
 #!/bin/sh
 
+echo "Verifying formatting"
 cargo fmt --all --check

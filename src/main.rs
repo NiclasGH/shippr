@@ -28,7 +28,7 @@ enum Command {
     /// Initialized deployment configuration in current directory
     Init {
         /// Name of resource to be deployed
-        name: String
+        name: String,
     },
     /// Configures the cluster
     Cluster {
