@@ -24,16 +24,16 @@ location:                                               # Required - Exactly one
 ## Usage
 **shippr**
 ```
+A simple binary to manage your helmcharts
+
 Usage: shippr [OPTIONS] <COMMAND>
 
 Commands:
-  cluster <NAME>    Configures the cluster
-  check <DIR>       Verifies that the chart can be deployed
-  deploy <DIR>      Deploys helm chart by its deployment file
-  cleanup <DIR>     Cleans up any releases that are deployed but not defined
-    -n <NAMESPACE>  Namespace to cleanup
-
-  help              Print this message or the help of the given subcommand(s)
+  cluster  Configures the cluster
+  check    Verifies that the chart can be deployed
+  deploy   Deploys helm chart by its deployment file
+  cleanup  Cleans up any releases that are deployed but not defined
+  help     Print this message or the help of the given subcommand(s)
 
 Options:
   -v, --verbose...  Enables verbose logging. [Default: ERROR logs]
