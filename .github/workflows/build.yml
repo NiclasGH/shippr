@@ -37,12 +37,16 @@ jobs:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
       - name: Install the Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           components: rustfmt
+
       - uses: Swatinem/rust-cache@v2
+
       - name: Enforce formatting
         run: cargo fmt --all --check
 
@@ -50,16 +54,20 @@ jobs:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
       - name: Install the Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           components: clippy
+
       - uses: Swatinem/rust-cache@v2
+
       - name: Linting
         run: cargo clippy --all -- -D warnings
 
-  release:
+  release-binary:
     if: github.ref_type == 'tag'
     needs: [test, fmt, clippy]
     name: Release - ${{ matrix.platform.os-name }}
@@ -86,10 +94,6 @@ jobs:
             runs-on: ubuntu-24.04
             target: riscv64gc-unknown-linux-gnu
 
-          - os-name: Windows-x86_64
-            runs-on: windows-latest
-            target: x86_64-pc-windows-msvc
-
           - os-name: macOS-x86_64
             runs-on: macOS-latest
             target: x86_64-apple-darwin
@@ -99,8 +103,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: Swatinem/rust-cache@v2
-
       - name: Build binary
         uses: houseabsolute/actions-rust-cross@v1
         with:
@@ -108,18 +110,48 @@ jobs:
           target: ${{ matrix.platform.target }}
           args: "--locked --release"
           strip: true
+          use-rust-cache: true
+
+      - name: Rename binary and move to root
+        shell: bash
+        run: |
+          BINARY_PATH=$(find . -name "shippr" -type f | head -1)
+          mv "$BINARY_PATH" "./shippr-${{ matrix.platform.os-name }}"
+          echo "Found binary at: $BINARY_PATH"
+          ls -la ./shippr-*
+
+      - name: Create checksum
+        shell: bash
+        run: |
+          shasum -a 256 "./shippr-${{ matrix.platform.os-name }}" > "./shippr-${{ matrix.platform.os-name }}.checksum.sha256"
+          cat ./shippr-*.sha256
 
       - name: Publish release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: shippr-${{ matrix.platform.os_name }}
-          path: "shippr*"
+          name: "shippr-${{ github.ref_name }}-${{ matrix.platform.os-name }}"
+          path: |
+            shippr-${{ matrix.platform.os-name }}*
+            shippr-${{ matrix.platform.os-name }}*.sha256
+          if-no-files-found: error
 
-      - name: Publish GitHub release
+      - name: Add binary to GitHub Release ${{ github.ref_name }}
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          files: |
-            shippr*
-            LICENSE
-          # body_path: Changes.md
+          files: shippr-${{ matrix.platform.os-name }}*
+
+
+  release-metadata:
+    if: github.ref_type == 'tag'
+    needs: [release-binary]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Add LICENSE to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: LICENSE
