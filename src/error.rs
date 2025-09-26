@@ -28,6 +28,11 @@ pub enum Error {
     #[error("The release name could not be determined in that namespace")]
     CouldNotFigureOutReleaseName,
 
+    #[error(
+        "The given release name cannot be the path. As such it cannot contain characters like /"
+    )]
+    ReleaseNameIsPath,
+
     // external errors
     #[error("Configuration Error: {0}")]
     ConfigError(#[from] config::ConfigError),

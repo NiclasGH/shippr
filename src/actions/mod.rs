@@ -12,4 +12,7 @@ pub use cluster::set::set_cluster;
 mod deploy;
 pub use deploy::deploy;
 
+mod init;
+pub use init::initialize_configuration;
+
 mod values;

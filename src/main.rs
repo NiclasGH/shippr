@@ -100,7 +100,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     command_available("helm")?;
 
     match app.command {
-        Command::Init { name: _ } => todo!("Unimplemented"),
+        Command::Init { name } => shippr::actions::initialize_configuration(name)?,
 
         Command::Check { profile, args } => shippr::actions::check(profile, args.dir)?,
 
