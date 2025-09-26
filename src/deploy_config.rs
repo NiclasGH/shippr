@@ -1,6 +1,6 @@
 use config::File;
 use serde::Deserialize;
-use std::path::Path;
+use std::{fs, path::Path};
 use tracing::{debug, warn};
 
 use crate::{Error, Result, command::Command};
@@ -46,8 +46,13 @@ impl Default for DeploymentFileName {
 
 impl Deployment {
     pub fn new(base_path: &Path, file_name: Option<DeploymentFileName>) -> Result<Self> {
-        let directory_name = Self::dir_name(base_path)?;
-        let directory_path = base_path
+        if !base_path.exists() && !base_path.is_dir() {
+            return Err(Error::InvalidDirectory);
+        }
+        let absolute_path = fs::canonicalize(base_path)?;
+
+        let directory_name = Self::dir_name(&absolute_path)?;
+        let absolute_path_string = base_path
             .as_os_str()
             .to_str()
             .ok_or(Error::InvalidDirectory)?;
@@ -59,7 +64,7 @@ impl Deployment {
             })
             .0;
 
-        let config_path = format!("{directory_path}/{file_name}");
+        let config_path = format!("{absolute_path_string}/{file_name}");
 
         let chart: DeployChart = config::Config::builder()
             .add_source(File::with_name(&config_path))
@@ -152,7 +157,7 @@ mod tests {
         location:
             repo: TestRepo
         "#;
-        writeln!(&mut deployment_file, "{}", file_content)?;
+        writeln!(&mut deployment_file, "{file_content}")?;
         let binding = deployment_file.into_temp_path();
         let file_name = binding.file_name().unwrap().to_str().unwrap();
 
@@ -191,7 +196,7 @@ mod tests {
             repo: TestRepo
             local: TestPath
         "#;
-        writeln!(&mut deployment_file, "{}", file_content)?;
+        writeln!(&mut deployment_file, "{file_content}")?;
         let binding = deployment_file.into_temp_path();
         let file_name = binding.file_name().unwrap().to_str().unwrap();
 

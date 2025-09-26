@@ -1,2 +1,1 @@
-- Allow . as path
 - Auto build github action

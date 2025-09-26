@@ -4,7 +4,7 @@ pub(crate) type Result<T> = std::result::Result<T, Error>;
 
 #[derive(thiserror::Error)]
 pub enum Error {
-    #[error("The given directory is not a valid path")]
+    #[error("The given directory is not a valid directory path")]
     InvalidDirectory,
 
     #[error("Either --namespace or --all-namespaces must be present")]
