@@ -38,7 +38,7 @@ fn create_deploy(
     command
         .args(["upgrade", "--install"])
         .arg("--wait")
-        .args(["--timeout", "180"])
+        .args(["--timeout", "3m0s"])
         .args(["-f", values_default.to_str().unwrap()]);
 
     if let Some(p) = values_profile {
@@ -75,6 +75,7 @@ mod tests {
         assert_eq!(result.get_args(), [
             "upgrade", "--install",
             "--wait",
+            "--timeout", "3m0s",
             "-f", "values-default.yaml",
             "--version", "TestVersion",
             "--namespace", "TestNamespace",
@@ -103,6 +104,7 @@ mod tests {
         assert_eq!(result.get_args(), [
             "upgrade", "--install",
             "--wait",
+            "--timeout", "3m0s",
             "-f", "values-default.yaml",
             "-f", "values-test.yaml",
             "--version", "TestVersion",

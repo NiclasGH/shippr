@@ -1,3 +1,3 @@
-- Add warn that no namespace was passed
 - Allow . as path
+- Use TOML instead of Yaml
 - Auto build github action
