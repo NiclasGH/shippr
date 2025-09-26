@@ -2,6 +2,7 @@ mod check;
 pub use check::check;
 
 mod cleanup;
+pub use cleanup::action::cleanup_all_namespaces;
 pub use cleanup::action::cleanup_namespace;
 
 mod cluster;

@@ -32,10 +32,18 @@ impl Releases {
         self.content.len()
     }
 
-    pub(super) fn undeploy(self, namespace: &str) -> Result<(), Error> {
+    pub(super) fn undeploy_namespace(self, namespace: &str) -> Result<(), Error> {
         for release in &self.content {
             println!("Undeploying {release}");
-            create_undeploy(namespace, release).execute()?;
+            create_undeploy_namespace(namespace, release).execute()?;
+        }
+        Ok(())
+    }
+
+    pub(super) fn undeploy_all_namespaces(self) -> Result<(), Error> {
+        for release in &self.content {
+            println!("Undeploying {release}");
+            create_undeploy_all_namespaces(release).execute()?;
         }
         Ok(())
     }
@@ -69,10 +77,17 @@ impl FromStr for Releases {
     }
 }
 
-fn create_undeploy(namespace: &str, release_name: &Release) -> Command {
+fn create_undeploy_namespace(namespace: &str, release_name: &Release) -> Command {
     let mut command = Command::new("helm");
     command.args(["uninstall", release_name]);
     command.args(["--namespace", namespace]);
+    command
+}
+
+fn create_undeploy_all_namespaces(release_name: &Release) -> Command {
+    let mut command = Command::new("helm");
+    command.args(["uninstall", release_name]);
+    command.arg("-A");
     command
 }
 

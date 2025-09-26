@@ -1,7 +1,6 @@
 use std::{error::Error, path::PathBuf};
 
 use clap::{ArgAction, Args, Parser, Subcommand};
-use tracing::warn;
 
 #[derive(Debug, Parser)]
 #[clap(version)]
@@ -94,7 +93,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             if !all_namespaces && namespace.is_some() {
                 shippr::actions::cleanup_namespace(namespace.unwrap(), args.dir, args.no_verify)?
             } else if all_namespaces {
-                warn!("Unimplemented cleanup all namespaces")
+                shippr::actions::cleanup_all_namespaces(args.dir, args.no_verify)?
             } else {
                 return Err(Box::new(shippr::Error::NoNamespacePassed));
             }
