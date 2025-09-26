@@ -69,12 +69,6 @@ fn find_currently_released_in_namespace(namespace: &str) -> Result<Releases> {
     releases.parse()
 }
 
-fn find_currently_released_in_all_namespace() -> Result<Releases> {
-    let releases = create_list_releases_in_all_namespace().output()?;
-
-    releases.parse()
-}
-
 fn create_list_releases_in_namespace(namespace: &str) -> Command {
     let mut command = Command::new("helm");
     command
@@ -83,6 +77,12 @@ fn create_list_releases_in_namespace(namespace: &str) -> Command {
         .args(["-o", "yaml"]);
 
     command
+}
+
+fn find_currently_released_in_all_namespace() -> Result<Releases> {
+    let releases = create_list_releases_in_all_namespace().output()?;
+
+    releases.parse()
 }
 
 fn create_list_releases_in_all_namespace() -> Command {

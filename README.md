@@ -9,7 +9,9 @@ If you use multiple profiles, you can also add multiple files like `values-dev.y
 Read the [Rust CLI Book](https://rust-cli.github.io/book/index.html) if you're interested in creating your own CLI
 
 ## Deployment file
-The deployment file supports the following file formats: TOML, JSON, YAML, INI, RON, JSON.
+The deployment file supports the following file formats: YAML, TOML, JSON, INI, RON, JSON. The primary file format for shippr is YAML. \
+Why YAML by default?? - Helm works with YAML. Having different file formats is confusing than just using these very simple Yamls. Fully enabling something like TOML would require mapping between the formats which I wanted to avoid. \
+However if you dont mind, feel free to switch to any other of the listed file formats for your deployment.yaml
 
 In there you simply need the following structure (example in yaml):
 ```yaml
