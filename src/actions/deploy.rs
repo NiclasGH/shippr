@@ -23,7 +23,7 @@ pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf, no_verify: bool
         return Ok(());
     }
 
-    println!("Deploying chart. This can take up to 3 minutes");
+    println!("Deploying chart. This can take up to 2 minutes");
     create_deploy(deployment, values_default, values_profile).execute()?;
 
     Ok(())
@@ -38,7 +38,7 @@ fn create_deploy(
     command
         .args(["upgrade", "--install"])
         .arg("--wait")
-        .args(["--timeout", "3m0s"])
+        .args(["--timeout", "2m0s"])
         .args(["-f", values_default.to_str().unwrap()]);
 
     if let Some(p) = values_profile {
@@ -75,7 +75,7 @@ mod tests {
         assert_eq!(result.get_args(), [
             "upgrade", "--install",
             "--wait",
-            "--timeout", "3m0s",
+            "--timeout", "2m0s",
             "-f", "values-default.yaml",
             "--version", "TestVersion",
             "--namespace", "TestNamespace",
@@ -104,7 +104,7 @@ mod tests {
         assert_eq!(result.get_args(), [
             "upgrade", "--install",
             "--wait",
-            "--timeout", "3m0s",
+            "--timeout", "2m0s",
             "-f", "values-default.yaml",
             "-f", "values-test.yaml",
             "--version", "TestVersion",
