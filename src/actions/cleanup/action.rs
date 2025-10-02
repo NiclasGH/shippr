@@ -1,8 +1,10 @@
+use tracing::{debug, info, warn};
+
 use crate::Result;
 use crate::actions::cleanup::model::Releases;
 use crate::command::Command;
+use crate::deploy_config::Deployment;
 use crate::io::user_confirmation;
-use log::debug;
 use std::path::PathBuf;
 
 pub fn cleanup_all_namespaces(dir: PathBuf, no_verify: bool) -> Result<()> {
@@ -20,7 +22,7 @@ pub fn cleanup_all_namespaces(dir: PathBuf, no_verify: bool) -> Result<()> {
     if !no_verify && !user_confirmation(&user_confirm)? {
         return Ok(());
     }
-    difference.undeploy_all_namespaces()?;
+    difference.undeploy()?;
 
     Ok(())
 }
@@ -42,7 +44,7 @@ pub fn cleanup_namespace(namespace: String, dir: PathBuf, no_verify: bool) -> Re
     if !no_verify && !user_confirmation(&user_confirm)? {
         return Ok(());
     }
-    difference.undeploy_namespace(&namespace)?;
+    difference.undeploy()?;
 
     Ok(())
 }
@@ -53,14 +55,32 @@ fn find_defined_releases(dir: PathBuf) -> Result<Releases> {
         .filter_map(|entry| {
             let entry = entry.ok()?;
             if entry.file_type().ok()?.is_dir() {
-                return entry.file_name().into_string().ok();
+                let name = entry.file_name().into_string().ok()?;
+                if name.starts_with(".") {
+                    return None;
+                }
+
+                let deployment = match Deployment::new(&entry.path(), None) {
+                    Ok(v) => Some(v),
+                    Err(err) => {
+                        warn!(
+                            "Error when reading deployment.yaml: release: {}, err: {}",
+                            name, err
+                        );
+                        None
+                    }
+                }?;
+
+                return Some((name, deployment.chart.namespace));
             }
 
             None
         })
         .collect();
 
-    Ok(Releases::new(releases))
+    let releases = Ok(Releases::new(releases));
+    info!("Found the currently defined releases: {releases:?}");
+    releases
 }
 
 fn find_currently_released_in_namespace(namespace: &str) -> Result<Releases> {
@@ -82,7 +102,9 @@ fn create_list_releases_in_namespace(namespace: &str) -> Command {
 fn find_currently_released_in_all_namespace() -> Result<Releases> {
     let releases = create_list_releases_in_all_namespace().output()?;
 
-    releases.parse()
+    let releases = releases.parse();
+    info!("Found the following releases currently deployed: {releases:?}");
+    releases
 }
 
 fn create_list_releases_in_all_namespace() -> Command {

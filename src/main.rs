@@ -134,6 +134,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 fn setup_logger(app: &App) {
     let log_level = if app.verbose == 0 {
         tracing::Level::ERROR
+    } else if app.verbose == 1 {
+        tracing::Level::INFO
     } else {
         tracing::Level::DEBUG
     };

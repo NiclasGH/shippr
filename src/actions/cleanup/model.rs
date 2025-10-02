@@ -5,14 +5,16 @@ use crate::Error;
 use crate::command::Command;
 use yaml_rust2::{Yaml, YamlLoader};
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub(super) struct Releases {
     content: Vec<Release>,
 }
-pub(super) type Release = String;
+pub(super) type Release = (Name, Namespace);
+pub(super) type Name = String;
+pub(super) type Namespace = String;
 
 impl Releases {
-    pub(super) fn new(content: Vec<String>) -> Self {
+    pub(super) fn new(content: Vec<Release>) -> Self {
         Releases { content }
     }
 
@@ -32,18 +34,10 @@ impl Releases {
         self.content.len()
     }
 
-    pub(super) fn undeploy_namespace(self, namespace: &str) -> Result<(), Error> {
+    pub(super) fn undeploy(self) -> Result<(), Error> {
         for release in &self.content {
-            println!("Undeploying {release}");
-            create_undeploy_namespace(namespace, release).execute()?;
-        }
-        Ok(())
-    }
-
-    pub(super) fn undeploy_all_namespaces(self) -> Result<(), Error> {
-        for release in &self.content {
-            println!("Undeploying {release}");
-            create_undeploy_all_namespaces(release).execute()?;
+            println!("Undeploying {} in namespace {}", release.0, release.1);
+            create_undeploy(release).execute()?;
         }
         Ok(())
     }
@@ -51,7 +45,12 @@ impl Releases {
 
 impl Display for Releases {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.content.join(" "))
+        let releases_list: Vec<String> = self
+            .content
+            .iter()
+            .map(|r| format!("Name: {}, Namespace: {}", r.0, r.1))
+            .collect();
+        write!(f, "{}", releases_list.join(" ; "))
     }
 }
 
@@ -69,7 +68,7 @@ impl FromStr for Releases {
 
         match yaml {
             Yaml::Array(releases) => {
-                let content = releases.iter().filter_map(find_release_name).collect();
+                let content = releases.iter().filter_map(find_release_info).collect();
                 Ok(Self { content })
             }
             _ => Ok(Self::default()),
@@ -77,31 +76,38 @@ impl FromStr for Releases {
     }
 }
 
-fn create_undeploy_namespace(namespace: &str, release_name: &Release) -> Command {
+fn create_undeploy(release: &Release) -> Command {
     let mut command = Command::new("helm");
-    command.args(["uninstall", release_name]);
-    command.args(["--namespace", namespace]);
+    command.args(["uninstall", &release.0]);
+    command.args(["--namespace", &release.1]);
     command
 }
 
-fn create_undeploy_all_namespaces(release_name: &Release) -> Command {
-    let mut command = Command::new("helm");
-    command.args(["uninstall", release_name]);
-    command.arg("-A");
-    command
-}
-
-fn find_release_name(release: &Yaml) -> Option<String> {
+fn find_release_info(release: &Yaml) -> Option<(Name, Namespace)> {
     match release {
-        Yaml::Hash(hash) => hash
-            .get(&Yaml::String("name".to_string()))
-            .and_then(|name| {
-                if let Yaml::String(name_str) = name {
-                    Some(name_str.to_string())
-                } else {
-                    None
-                }
-            }),
+        Yaml::Hash(hash) => {
+            let name: Name = hash
+                .get(&Yaml::String("name".to_string()))
+                .and_then(|name| {
+                    if let Yaml::String(name_str) = name {
+                        Some(name_str.to_string())
+                    } else {
+                        None
+                    }
+                })?;
+
+            let namespace: Namespace =
+                hash.get(&Yaml::String("namespace".to_string()))
+                    .and_then(|namespace| {
+                        if let Yaml::String(namespace_str) = namespace {
+                            Some(namespace_str.to_string())
+                        } else {
+                            None
+                        }
+                    })?;
+
+            Some((name, namespace))
+        }
         _ => None,
     }
 }
@@ -124,9 +130,9 @@ mod tests {
         // then
         assert_eq!(result.content.len(), 3);
         let content = result.content;
-        assert_eq!(content[0], "test1");
-        assert_eq!(content[1], "test2");
-        assert_eq!(content[2], "test3");
+        assert_eq!(content[0], ("test1".to_string(), "namespace1".to_string()));
+        assert_eq!(content[1], ("test2".to_string(), "namespace2".to_string()));
+        assert_eq!(content[2], ("test3".to_string(), "namespace3".to_string()));
 
         Ok(())
     }
@@ -171,21 +177,21 @@ mod tests {
         - app_version:
           chart: nginx-1.0.0
           name: test1
-          namespace: manual
+          namespace: namespace1
           revision: '1'
           status: deployed
           updated: 2025-02-24 14:29:36.687922 +0100 CET
         - app_version:
           chart: nginx-1.0.0
           name: test2
-          namespace: doesnt matter
+          namespace: namespace2
           revision: '2'
           status: deployed
           updated: 2025-02-24 14:29:36.687922 +0100 CET
         - app_version:
           chart: nginx-1.0.0
           name: test3
-          namespace: manual
+          namespace: namespace3
           revision: '3'
           status: deployed
           updated: 2025-02-24 14:29:36.687922 +0100 CET

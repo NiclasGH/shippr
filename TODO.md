@@ -1,1 +1,2 @@
-- Auto build github action
+- Undeploy
+- Fix Cleanup not allowed to use -A

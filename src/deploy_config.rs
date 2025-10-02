@@ -8,13 +8,13 @@ use crate::{Error, Result, command::Command};
 #[derive(Debug)]
 pub struct Deployment {
     release: Release,
-    chart: DeployChart,
+    pub chart: DeployChart,
 }
 #[derive(Debug, Deserialize)]
-struct DeployChart {
+pub struct DeployChart {
     name: String,
     version: Option<String>,
-    namespace: String,
+    pub namespace: String,
     location: Location,
 }
 #[derive(Debug)]
@@ -36,6 +36,7 @@ struct Location {
     local: Option<String>,
 }
 
+#[derive(Debug)]
 pub struct DeploymentFileName(String);
 
 impl Default for DeploymentFileName {
@@ -59,8 +60,9 @@ impl Deployment {
 
         let file_name = file_name
             .unwrap_or_else(|| {
-                debug!("File name not provided. Taking default");
-                DeploymentFileName::default()
+                let default = DeploymentFileName::default();
+                debug!("File name not provided. Taking default: {default:?}");
+                default
             })
             .0;
 
