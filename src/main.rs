@@ -53,6 +53,10 @@ enum Command {
         #[command(flatten)]
         args: ActionArgs,
     },
+    Undeploy {
+        #[command(flatten)]
+        args: ActionArgs,
+    },
     /// Cleans up any releases that are deployed but not defined.
     ///
     /// For this it uses the given namespace and the context directory.
@@ -126,6 +130,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         Command::Deploy { profile, args } => {
             shippr::actions::deploy(profile, args.dir, args.no_verify)?
         }
+
+        Command::Undeploy { args } => shippr::actions::undeploy(args.dir, args.no_verify)?,
     }
 
     Ok(())

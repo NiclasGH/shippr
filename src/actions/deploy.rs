@@ -17,7 +17,8 @@ pub fn deploy(profile: Option<String>, deploy_file_dir: PathBuf, no_verify: bool
     let values_profile = values::profile(deploy_file_dir, &profile)?;
 
     let prompt = format!(
-        "Do you really want to deploy? Please verify the configured namespace. profile: {profile:?}: [Y/N]"
+        "Do you really want to deploy? profile: {profile:?} namespace: {}: [Y/N]",
+        deployment.chart.namespace
     );
     if !no_verify && !user_confirmation(&prompt)? {
         return Ok(());

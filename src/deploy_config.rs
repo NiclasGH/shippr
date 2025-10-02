@@ -99,6 +99,11 @@ impl Deployment {
         self.release.append_release_information(command);
         self.chart.append_chart_location(command);
     }
+
+    pub fn append_undeployment_information(&self, command: &mut Command) {
+        self.release.append_release_information(command);
+        self.chart.append_namespace(command);
+    }
 }
 
 impl Release {
@@ -119,6 +124,10 @@ impl DeployChart {
 
         command.args(["--namespace", &self.namespace]);
         command.arg("--create-namespace");
+    }
+
+    fn append_namespace(&self, command: &mut Command) {
+        command.args(["--namespace", &self.namespace]);
     }
 
     fn append_chart_location(&self, command: &mut Command) {
