@@ -15,7 +15,7 @@ However if you dont mind, feel free to switch to any other of the listed file fo
 
 In there you simply need the following structure. While local works for the location, it is mainly meant for testing purposes. While relative paths also work, it is recommended to use absolut paths, as it takes the exeuction directory as its base path
 ```yaml
-name: ingress-nginx                                     # Required / Name under which the Chart is being released
+name: ingress-nginx                                     # Required / Name of the Chart. NOT the name of the release
 version: 1.12.0                                         # Optional / Version of the Chart
 namespace: ingress-nginx                                # Required / Namespace in which the Chart is being released
 location:                                               # Required - Exactly one / Location where to find the Chart
