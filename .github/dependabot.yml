@@ -7,3 +7,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      logging:
+        applies-to: version-updates
+        patterns:
+          - "tracing*"
