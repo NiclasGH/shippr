@@ -2,8 +2,6 @@ name: Build Pipeline
 
 on:
   push:
-  pull_request:
-    types: [opened, synchronize, reopened]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
