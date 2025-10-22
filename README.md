@@ -1,4 +1,10 @@
-# shippr
+<div align="center">
+    <h2>
+        <img src=".github/readme/shippr.png" alt="shippr banner">
+        <br/>
+    </h2>
+</div>
+
 A simple binary to manage your helmcharts.
 Often you dont write a helmchart simply to deploy it but often you re-use it for multiple deployments or you slightly adjust it differently on different machines. shippr wants to support this by adding the concept of a new file: `deployment`. For your applications, split helmcharts and deployments. In a given directory you will find at minimum 2 things:
 1. A deployment file, that specifies the helmchart and version
