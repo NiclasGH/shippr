@@ -113,12 +113,14 @@ fn main() -> Result<(), Box<dyn Error>> {
             all_namespaces,
             args,
         } => {
-            if !all_namespaces && namespace.is_some() {
-                shippr::actions::cleanup_namespace(namespace.unwrap(), args.dir, args.no_verify)?
-            } else if all_namespaces {
-                shippr::actions::cleanup_all_namespaces(args.dir, args.no_verify)?
+            if !all_namespaces {
+                if let Some(ns) = namespace {
+                    shippr::actions::cleanup_namespace(ns, args.dir, args.no_verify)?
+                } else {
+                    return Err(shippr::Error::NoNamespacePassed.into());
+                }
             } else {
-                return Err(shippr::Error::NoNamespacePassed.into());
+                shippr::actions::cleanup_all_namespaces(args.dir, args.no_verify)?
             }
         }
 
