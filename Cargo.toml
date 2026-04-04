@@ -10,7 +10,7 @@ serde = { version = "1.0", features = ["derive"] }
 thiserror = "2"
 tracing = "0.1"
 tracing-subscriber = "0.3"
-log = "0.4.25"
+log = "0.4.29"
 
 yaml-rust2 = "0.10" # Required because helm outputs in yaml. Project uses TOML
 
